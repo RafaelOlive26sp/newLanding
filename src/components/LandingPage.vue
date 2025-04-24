@@ -1,209 +1,164 @@
 <template>
   <v-app>
-    <!-- Header -->
-    <v-app-bar app color="primary" dark>
-      <v-toolbar-title>
-        <v-img src="https://via.placeholder.com/150x50?text=Logo" max-width="120" alt="Logo Plataforma" />
-      </v-toolbar-title>
-      <v-spacer />
-      <v-toolbar-items class="hidden-sm-and-down">
-        <v-btn text to="/">Início</v-btn>
-        <v-btn text to="/sobre">Sobre</v-btn>
-        <v-btn text to="/aulas">Aulas</v-btn>
-        <v-btn color="accent" to="/login" class="ml-4">Login</v-btn>
-      </v-toolbar-items>
-      <v-app-bar-nav-icon class="hidden-md-and-up" @click="drawer = !drawer" />
-    </v-app-bar>
-
-    <!-- Menu Lateral para Mobile -->
-    <v-navigation-drawer v-model="drawer" app temporary>
-      <v-list>
-        <v-list-item to="/">
-          <v-list-item-title>Início</v-list-item-title>
-        </v-list-item>
-        <v-list-item to="/sobre">
-          <v-list-item-title>Sobre</v-list-item-title>
-        </v-list-item>
-        <v-list-item to="/aulas">
-          <v-list-item-title>Aulas</v-list-item-title>
-        </v-list-item>
-        <v-list-item to="/login">
-          <v-list-item-title>Login</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-
-    <!-- Conteúdo Principal -->
     <v-main>
-      <!-- Banner Principal (Parallax) -->
+      <!-- Hero Section com Parallax -->
       <v-parallax
-        src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1920&q=80"
-        height="600"
+        height="500"
+        src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80"
       >
-        <v-row align="center" justify="center">
-          <v-col cols="12" md="8" class="text-center">
-            <h1 class="text-h4 text-md-h2 white--text font-weight-bold">
-              Transforme sua Saúde com Treinos Funcionais
-            </h1>
-            <h3 class="text-h6 text-md-h5 white--text mt-4">
-              Agende suas aulas e alcance seus objetivos com treinos personalizados.
-            </h3>
-            <v-btn color="accent" x-large class="mt-6" to="/login">Comece Agora</v-btn>
-          </v-col>
-        </v-row>
+        <div class="d-flex flex-column align-center justify-center text-dark text-center" style="height: 100%">
+          <h1 class="text-4xl font-bold mb-4">Funcional é mais que treino, é qualidade de vida</h1>
+          <p class="text-lg mb-6">Agende suas aulas com facilidade e tenha acompanhamento de verdade.</p>
+          <v-btn color="white" text="Entrar" class="text-primary font-bold" @click="goToLogin" />
+        </div>
       </v-parallax>
 
-      <!-- Seção de Benefícios -->
-      <v-container class="my-12">
-        <h2 class="text-h4 text-center mb-8">Por que Escolher Nosso Funcional?</h2>
-        <v-row>
-          <v-col cols="12" sm="6" md="3" v-for="benefit in benefits" :key="benefit.title">
-            <v-card class="text-center pa-4 benefit-card" elevation="4">
-              <v-icon x-large color="primary">{{ benefit.icon }}</v-icon>
-              <h3 class="text-h6 mt-4">{{ benefit.title }}</h3>
-              <p class="mt-2">{{ benefit.description }}</p>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-      <!-- Chamada para Ação -->
-      <v-container fluid class="primary py-12">
-        <v-row align="center" justify="center">
-          <v-col cols="12" md="8" class="text-center">
-            <h2 class="text-h4 white--text">Pronto para a Aventura?</h2>
-            <p class="text-h6 white--text mt-4">
-              Experimente a diferença de treinar com quem realmente se importa com você. Agende sua primeira aula agora!
-            </p>
-            <v-btn color="accent" x-large class="mt-6" to="/login">Quero Começar!</v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-
-      <!-- Seção de Depoimentos -->
-      <v-container fluid class="grey lighten-4 py-12">
-        <h2 class="text-h4 text-center mb-8">O que Nossos Alunos Dizem</h2>
-        <v-carousel hide-delimiters height="300" cycle>
-          <v-carousel-item v-for="testimonial in testimonials" :key="testimonial.name">
-            <v-row align="center" justify="center">
-              <v-col cols="12" md="6">
-                <v-card class="text-center pa-6" elevation="2">
-                  <v-avatar size="80" class="mb-4">
-                    <v-img :src="testimonial.image" :alt="testimonial.name" />
-                  </v-avatar>
-                  <p class="text-body-1 font-italic">“{{ testimonial.text }}”</p>
-                  <p class="text-body-2 font-weight-bold mt-2">{{ testimonial.name }}</p>
+      <!-- Benefícios -->
+      <section class="benefits-section py-16 px-4 text-center">
+        <h2 class="text-3xl font-semibold mb-10">Benefícios do Treinamento Funcional</h2>
+        <v-container>
+          <v-row justify="center" align="center">
+            <v-col cols="12" md="3" v-for="(benefit, i) in benefits" :key="i">
+              <v-hover v-slot="{ isHovering, props }">
+                <v-card
+                  v-bind="props"
+                  class="pa-4 transition-transform"
+                  :class="{ 'hover-scale': isHovering }"
+                  elevation="2"
+                >
+                  <v-icon color="primary" class="mb-2" size="40">{{ benefit.icon }}</v-icon>
+                  <h3 class="text-xl font-medium mb-2">{{ benefit.title }}</h3>
+                  <p class="text-gray-600">{{ benefit.text }}</p>
                 </v-card>
-              </v-col>
-            </v-row>
-          </v-carousel-item>
-        </v-carousel>
-      </v-container>
+              </v-hover>
+            </v-col>
+          </v-row>
+        </v-container>
+      </section>
 
-      <!-- Chamada para Ação Final -->
-      <v-container fluid class="primary py-12">
-        <v-row align="center" justify="center">
-          <v-col cols="12" md="8" class="text-center">
-            <h2 class="text-h4 white--text">Pronto para Começar?</h2>
-            <p class="text-h6 white--text mt-4">
-              Faça parte da nossa comunidade e agende sua primeira aula hoje.
-            </p>
-            <v-btn color="accent" x-large class="mt-6" to="/login">Agendar Agora</v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
+      <!-- Profissionais -->
+      <section class="trainers-section py-16 px-4 text-center bg-gray-100">
+        <h2 class="text-3xl font-semibold mb-10">Profissionais Capacitados</h2>
+        <p class="max-w-xl mx-auto text-gray-700 mb-8">
+          Nossa equipe é formada por especialistas com experiência comprovada em treinamento funcional, comprometidos em oferecer atenção personalizada a cada aluno.
+        </p>
+        <v-avatar size="100" class="mx-auto mb-4">
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Professor" />
+        </v-avatar>
+        <p class="text-lg font-medium">Professor João Silva</p>
+        <p class="text-gray-600">Especialista em Mobilidade e Funcional</p>
+      </section>
+
+      <!-- Diferencial -->
+      <section class="differential-section py-16 px-4 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Mais do que uma academia</h2>
+        <p class="text-gray-700 max-w-2xl mx-auto">
+          Aqui você encontra acompanhamento real, com turmas de no máximo 5 alunos. Mais foco, mais atenção, mais resultado.
+        </p>
+      </section>
+
+      <!-- Depoimentos -->
+      <section class="testimonials-section py-16 px-4 text-center bg-gray-50">
+        <h2 class="text-3xl font-semibold mb-10">O que nossos alunos dizem</h2>
+        <v-container>
+          <v-carousel cycle hide-delimiters height="300">
+            <v-carousel-item v-for="(testimonial, i) in testimonials" :key="i">
+              <v-card class="pa-6 mx-auto" max-width="400" elevation="1">
+                <p class="italic mb-4">"{{ testimonial.feedback }}"</p>
+                <v-avatar size="60" class="mx-auto mb-2">
+                  <img :src="testimonial.avatar" :alt="testimonial.name" />
+                </v-avatar>
+                <p class="font-medium">{{ testimonial.name }}</p>
+                <p class="text-gray-600 text-sm">{{ testimonial.description }}</p>
+              </v-card>
+            </v-carousel-item>
+          </v-carousel>
+        </v-container>
+      </section>
     </v-main>
-
-    <!-- Rodapé -->
-    <v-footer color="primary" dark padless>
-      <v-container>
-        <v-row>
-          <v-col cols="12" md="4" class="text-center text-md-left">
-            <p class="text-body-2">© 2025 Plataforma Funcional. Todos os direitos reservados.</p>
-          </v-col>
-          <v-col cols="12" md="4" class="text-center">
-            <v-btn icon href="#" class="mx-2">
-              <v-icon>mdi-facebook</v-icon>
-            </v-btn>
-            <v-btn icon href="#" class="mx-2">
-              <v-icon>mdi-instagram</v-icon>
-            </v-btn>
-            <v-btn icon href="#" class="mx-2">
-              <v-icon>mdi-twitter</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="12" md="4" class="text-center text-md-right">
-            <v-btn text to="/sobre">Sobre</v-btn>
-            <v-btn text to="/contato">Contato</v-btn>
-            <v-btn text to="/politica">Política de Privacidade</v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-footer>
   </v-app>
 </template>
 
 <script setup>
-  import { ref } from 'vue';
+  import { useRouter } from 'vue-router'
+  import { ref } from 'vue'
 
-  // Estado reativo para o menu lateral
-  const drawer = ref(false);
+  const router = useRouter()
 
-  // Dados dos benefícios
+  const goToLogin = () => {
+    router.push('/login')
+  }
+
   const benefits = ref([
     {
-      title: 'Treinos Personalizados',
-      description: 'Aulas adaptadas ao seu nível e objetivos.',
-      icon: 'mdi-dumbbell',
+      icon: 'mdi-run-fast',
+      title: 'Melhora da Mobilidade',
+      text: 'Movimente-se com mais liberdade e conforto.',
     },
     {
-      title: 'Acompanhamento Profissional',
-      description: 'Instrutores qualificados para guiar você.',
-      icon: 'mdi-account-star',
+      icon: 'mdi-heart-pulse',
+      title: 'Condicionamento Físico',
+      text: 'Aumente sua resistência e saúde cardiovascular.',
     },
     {
-      title: 'Flexibilidade de Horários',
-      description: 'Agende suas aulas quando for mais conveniente.',
-      icon: 'mdi-calendar-clock',
+      icon: 'mdi-shield-check',
+      title: 'Prevenção de Lesões',
+      text: 'Exercícios pensados para proteger seu corpo.',
     },
     {
-      title: 'Comunidade Motivadora',
-      description: 'Treine com quem te inspira e motiva.',
-      icon: 'mdi-account-group',
+      icon: 'mdi-emoticon-happy-outline',
+      title: 'Qualidade de Vida',
+      text: 'Viva com mais disposição e bem-estar.',
     },
-  ]);
+  ])
 
-  // Dados dos depoimentos
   const testimonials = ref([
     {
-      name: 'Ana, 32 anos',
-      text: 'As aulas me deram mais energia e disposição!',
-      image: 'https://via.placeholder.com/80?text=Ana',
+      name: 'Ana Souza',
+      feedback: 'Me sinto muito melhor desde que comecei! O atendimento é incrível e a atenção que recebo fez toda a diferença.',
+      avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+      description: 'Aluna desde 2023',
     },
     {
-      name: 'Carlos, 28 anos',
-      text: 'Os treinos são incríveis e os instrutores são ótimos!',
-      image: 'https://via.placeholder.com/80?text=Carlos',
+      name: 'Carlos Henrique',
+      feedback: 'Nunca consegui manter uma rotina de treinos como agora. As turmas pequenas realmente fazem diferença.',
+      avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+      description: 'Aluno desde 2022',
     },
     {
-      name: 'Mariana, 40 anos',
-      text: 'Consegui alcançar meus objetivos com a flexibilidade das aulas!',
-      image: 'https://via.placeholder.com/80?text=Mariana',
+      name: 'Luciana Dias',
+      feedback: 'Treinar aqui é diferente. Me sinto acolhida e motivada. Recomendo a todos!',
+      avatar: 'https://randomuser.me/api/portraits/women/3.jpg',
+      description: 'Aluna desde 2021',
     },
-  ]);
+    {
+      name: 'Marcos Lima',
+      feedback: 'A qualidade do atendimento e os exercícios são personalizados de verdade. Me sinto evoluindo a cada semana.',
+      avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
+      description: 'Aluno desde 2023',
+    },
+    {
+      name: 'Fernanda Alves',
+      feedback: 'Já tinha tentado de tudo, mas aqui encontrei o que precisava. Os professores são muito atenciosos.',
+      avatar: 'https://randomuser.me/api/portraits/women/5.jpg',
+      description: 'Aluna desde 2022',
+    },
+    {
+      name: 'Ricardo Mendes',
+      feedback: 'Ambiente acolhedor, treinos eficazes e muita atenção aos detalhes. Superou minhas expectativas!',
+      avatar: 'https://randomuser.me/api/portraits/men/6.jpg',
+      description: 'Aluno desde 2024',
+    },
+  ])
 </script>
 
 <style scoped>
-/* Overlay para legibilidade do texto no parallax */
-.v-parallax__content {
-  background: rgba(0, 0, 0, 0.4);
+.hero-section {
+  background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
 }
 
-/* Efeito de salto nos cards */
-.benefit-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.benefit-card:hover {
+.hover-scale {
   transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out;
 }
 </style>
