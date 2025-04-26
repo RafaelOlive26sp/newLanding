@@ -10,6 +10,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     AboutPage: typeof import('./src/components/AboutPage.vue')['default']
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    DialogView: typeof import('./src/components/dialog/DialogView.vue')['default']
+    FormCompleteProfile: typeof import('./src/components/forms/formCompleteProfile.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     LandingPage: typeof import('./src/components/LandingPage.vue')['default']
     LandingPageAluno: typeof import('./src/components/Telaaluno/LandingPageAluno.vue')['default']
