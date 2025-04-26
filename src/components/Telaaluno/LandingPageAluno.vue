@@ -33,7 +33,7 @@
     <v-main>
       <!-- Profile Incomplete Alert -->
       <v-alert v-if="!isProfileComplete" type="warning" color="amber-darken-2" class="ma-4"
-        @click="showProfileForm = true" clickable>
+        @click="dialogsHome(item, 'profileComplete')" clickable>
         Complete seu cadastro aqui!
       </v-alert>
 
@@ -41,7 +41,7 @@
       <v-parallax src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80"
         height="350">
         <div class="d-flex flex-column align-center justify-center h-100">
-          <h1 class="text-h4 font-weight-bold white--text">Bem-vindo ao seu espaço de treino!</h1>
+          <h1 class="text-h4 font-weight-bold white--text">Bem-vindo ao seu espaço !</h1>
           <p class="text-subtitle-1 white--text">Foco, saúde e atenção personalizada.</p>
         </div>
       </v-parallax>
@@ -136,59 +136,24 @@
         </v-card>
       </v-dialog>
 
-      <!-- Profile Form Dialog -->
-      <v-dialog v-model="showProfileForm" width="500">
-        <v-card>
-          <v-card-title class="text-h6 teal--text text--darken-1">
-            Ficha de Aluno
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" sm="4">
-                <v-text-field v-model="profile.age" label="Idade" type="number" outlined dense></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="4">
-                <v-text-field v-model="profile.height" label="Altura (cm)" type="number" outlined dense></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="4">
-                <v-text-field v-model="profile.weight" label="Peso (kg)" type="number" outlined dense></v-text-field>
-              </v-col>
-            </v-row>
-            <v-select v-model="profile.gender" label="Gênero" :items="['Masculino', 'Feminino', 'Outro']" outlined
-              dense></v-select>
-            <v-radio-group v-model="profile.smoker" label="Fuma?">
-              <v-radio label="Sim" value="Sim"></v-radio>
-              <v-radio label="Não" value="Não"></v-radio>
-            </v-radio-group>
-            <v-radio-group v-model="profile.exerciseLast6Months"
-              label="Praticou exercícios físicos nos últimos 6 meses?">
-              <v-radio label="Sim" value="Sim"></v-radio>
-              <v-radio label="Não" value="Não"></v-radio>
-            </v-radio-group>
-            <v-radio-group v-model="profile.currentlyExercising" label="Pratica exercícios atualmente?">
-              <v-radio label="Sim" value="Sim"></v-radio>
-              <v-radio label="Não" value="Não"></v-radio>
-            </v-radio-group>
-            <v-textarea v-model="profile.medicalRecommendations" label="Recomendações Médicas" outlined dense
-              rows="2"></v-textarea>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="teal-darken-1" dark @click="saveProfile">Concluir</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+
+      <DialogView v-model="dialogVisible" max-width="500">
+        <formCompleteProfile @profileComplete=""></formCompleteProfile>
+      </DialogView>
     </v-main>
   </v-app>
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref } from 'vue';
+  import formCompleteProfile from '../forms/formCompleteProfile.vue'
+  import DialogView from '../dialog/DialogView.vue'
 
+  const dialogVisible = ref(false)
   const drawer = ref(false)
   const showPayments = ref(false)
   const showAppointments = ref(false)
-  const showProfileForm = ref(false)
+  // const showProfileForm = ref(false)
   const theme = ref('light')
   const isProfileComplete = ref(false)
   const selectedPaymentMethod = ref(null)
@@ -199,16 +164,7 @@
     email: 'joao.silva@email.com',
   })
 
-  const profile = ref({
-    age: '',
-    height: '',
-    weight: '',
-    gender: '',
-    smoker: '',
-    exerciseLast6Months: '',
-    currentlyExercising: '',
-    medicalRecommendations: '',
-  })
+
 
   const appointments = ref([
     {
@@ -242,9 +198,25 @@
     theme.value = theme.value === 'light' ? 'dark' : 'light'
   }
 
-  const saveProfile = () => {
-    isProfileComplete.value = true
-    showProfileForm.value = false
+  const dialogsHome = async(item, type ) => {
+    isProfileComplete.value = true // se for true o alert de complete sua conta sera aberto
+    // dialogVisible.value = true
+
+
+    console.log(`item: ${item} -   tipo: ${type} `);
+
+    if(type === 'profileComplete'){
+      dialogVisible.value = true
+    }
+
+    // try {
+    //   const response = await completeUserApi()
+    //   console.log(response);
+
+    // } catch (error) {
+    //   console.log(error);
+
+    // }
   }
 
   const generatePayment = () => {
@@ -260,6 +232,7 @@
     selectedPaymentMethod.value = null
     paymentResult.value = null
   }
+
 </script>
 
 <style scoped>
