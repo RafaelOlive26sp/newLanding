@@ -32,10 +32,12 @@
     <!-- Main Content -->
     <v-main>
       <!-- Profile Incomplete Alert -->
-      <v-alert v-if="!isProfileComplete" type="warning" color="amber-darken-2" class="ma-4"
+      <v-alert v-if="!ifCompleteProfile" type="warning" color="amber-darken-2" class="ma-4"
         @click="dialogsHome(item, 'profileComplete')" clickable>
         Complete seu cadastro aqui!
       </v-alert>
+
+
 
       <!-- Parallax Header -->
       <v-parallax src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80"
@@ -148,7 +150,9 @@
   import { ref } from 'vue';
   import formCompleteProfile from '../forms/formCompleteProfile.vue'
   import DialogView from '../dialog/DialogView.vue'
+  import { useAuthStore } from '@/stores/auth.js'
 
+  const store = useAuthStore()
   const dialogVisible = ref(false)
   const drawer = ref(false)
   const showPayments = ref(false)
@@ -165,7 +169,7 @@
   })
 
 
-
+  const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord)
   const appointments = ref([
     {
       date: 'Segunda-feira',
@@ -193,6 +197,8 @@
     { amount: '150,00', dueDate: '30/04/2025' },
     { amount: '150,00', dueDate: '30/05/2025' },
   ])
+
+
 
   const toggleTheme = () => {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
