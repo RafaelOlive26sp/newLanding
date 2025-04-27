@@ -27,14 +27,14 @@ export const useAuthStore = defineStore('auth',{
 
       }
     },
-    async logout() {
+    async logout () {
       this.token = null;
       this.user = null;
       Cookies.remove('access_token');
       localStorage.removeItem('user');
-      await router.push({name:'login'});
+      await router.push('/home');
     },
-    initializeAuth(){
+    initializeAuth (){
       const token = Cookies.get('access_token');
       const user = localStorage.getItem('user');
       if(token && user){
