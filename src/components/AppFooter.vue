@@ -25,10 +25,13 @@
 <script setup>
   import { useAuthStore } from '@/stores/auth';
   import { logout as logoutApi } from '@/services/auth.js';
+  import { useRouter } from 'vue-router';
+
 
 
 
   const AuthStore = useAuthStore();
+  const router = useRouter()
 
 
   const items = [
@@ -42,7 +45,8 @@
   const handleLogout = async () => {
     try{
       const response = await logoutApi()
-      await AuthStore.logout(response)
+      AuthStore.logout(response)
+      router.push('/login');
     }catch (error) {
       console.error('Error ao fazer o Logout ',error)
     }
