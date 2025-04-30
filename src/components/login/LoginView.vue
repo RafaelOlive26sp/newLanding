@@ -12,9 +12,11 @@
                 variant="outlined" color="primary"></v-text-field>
               <v-btn type="submit" color="primary" class="mt-4" block rounded>Entrar</v-btn>
             </v-form>
-            <div class="text-center mt-4">
-              <span class="text-subtitle-2">Novo por aqui?</span>
-              <v-btn text color="secondary" class="ml-1" @click="goToRegister">Cadastre-se</v-btn>
+            <div class="text-center mt-1">
+              <v-btn variant="text" color="primary" class="text-caption font-weight-medium"
+                @click="goToRegister">
+                Cadastre-se
+              </v-btn>
             </div>
           </v-card-text>
           <v-card-actions class="justify-center">
@@ -30,19 +32,50 @@
       </v-snackbar>
     </v-main>
   </v-app>
+  <DialogView v-model="dialogView" max-width="500">
+    <cadatroAluno ></cadatroAluno>
+  </DialogView>
+  <SnackBarsView v-model="snackbar" :textContent="snackbarMessage">
+    <template #actions>
+      <v-btn color="pink" variant="text" @click="snackbar = false">
+        Close
+      </v-btn>
+    </template>
+  </SnackBarsView>
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch} from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/auth.js'
+  import { userUseStore } from '@/stores/user'
   import { login as loginApi } from '@/services/auth.js'
+  import DialogView from '@/components/dialog/DialogView.vue'
+  import cadatroAluno from '@/components/telaCadastro/CadastroView.vue'
+  import SnackBarsView from '@/components/snackBar/snackBarView.vue'
 
+  const useStore = userUseStore()
   const authStore = useAuthStore()
   const router = useRouter()
   const email = ref('')
   const password = ref('')
   const showError = ref(false)
+  const dialogView = ref(false)
+  const snackbarMessage = ref("");
+  const snackbar = ref(false);
+
+  watch(
+    ()=>useStore.responseCadastro,
+    async (newValue) =>{
+      if (newValue) {
+        dialogView.value = false,
+        snackbarMessage.value = 'Usuario cadastro com sucesso',
+        snackbar.value = true
+      }
+      return newValue.value = null
+    }
+
+  );
 
   const submitLogin = async () => {
     const data = {
@@ -64,11 +97,11 @@
   }
 
   const goToHome = () => {
-    router.push('/')
+    router.push('/home')
   }
 
   const goToRegister = () => {
-    router.push('/register')
+    dialogView.value = true
   }
 </script>
 
