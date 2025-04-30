@@ -12,10 +12,12 @@ import LandingPage from '../components/LandingPage.vue';
 import LoginView from '@/components/login/LoginView.vue';
 import LandingPageAluno from '@/components/Telaaluno/LandingPageAluno.vue';
 import { useAuthStore } from '../stores/auth.js';
+import CadastroView from '@/components/telaCadastro/CadastroView.vue';
 const manualRoutes = [
   { path: '/', component: LandingPage },
   { path: '/login', component: LoginView, meta: { guest: true } },
   { path: '/home', component: LandingPageAluno, meta: { requiresAuth: true } },
+  { path: '/register', component: CadastroView, meta: { guest: true } },
 ];
 
 const router = createRouter({
