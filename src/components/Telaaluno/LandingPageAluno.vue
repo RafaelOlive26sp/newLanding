@@ -215,14 +215,7 @@
       dialogVisible.value = true
     }
 
-    // try {
-    //   const response = await completeUserApi()
-    //   console.log(response);
 
-    // } catch (error) {
-    //   console.log(error);
-
-    // }
   }
 
   const generatePayment = () => {
