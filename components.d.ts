@@ -10,7 +10,9 @@ declare module 'vue' {
   export interface GlobalComponents {
     AboutPage: typeof import('./src/components/AboutPage.vue')['default']
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    CadastroView: typeof import('./src/components/telaCadastro/CadastroView.vue')['default']
     DialogView: typeof import('./src/components/dialog/DialogView.vue')['default']
+    FormCadastroUser: typeof import('./src/components/forms/formCadastroUser.vue')['default']
     FormCompleteProfile: typeof import('./src/components/forms/formCompleteProfile.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     LandingPage: typeof import('./src/components/LandingPage.vue')['default']
@@ -18,5 +20,6 @@ declare module 'vue' {
     LoginView: typeof import('./src/components/login/LoginView.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SnackBarView: typeof import('./src/components/snackBar/snackBarView.vue')['default']
   }
 }
