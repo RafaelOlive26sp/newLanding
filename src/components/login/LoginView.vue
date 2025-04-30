@@ -42,7 +42,7 @@
   const router = useRouter()
   const email = ref('')
   const password = ref('')
-  const showError = ref('')
+  const showError = ref(false)
 
   const submitLogin = async () => {
     const data = {
