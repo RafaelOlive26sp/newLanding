@@ -97,7 +97,7 @@
   }
 
   const goToHome = () => {
-    router.push('/home')
+    router.push('/')
   }
 
   const goToRegister = () => {
