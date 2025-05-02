@@ -32,10 +32,14 @@
     <!-- Main Content -->
     <v-main>
       <!-- Profile Incomplete Alert -->
-      <v-alert v-if="!ifCompleteProfile" type="warning" color="amber-darken-2" class="ma-4"
+      <v-alert v-if="!ifCompleteProfile " type="warning" color="amber-darken-2" class="ma-4"
         @click="dialogsHome(item, 'profileComplete')" clickable>
         Complete seu cadastro aqui!
       </v-alert>
+
+      {{ ifCompleteProfile }}
+
+
 
 
 
@@ -140,18 +144,20 @@
 
 
       <DialogView v-model="dialogVisible" max-width="500">
-        <formCompleteProfile @profileComplete=""></formCompleteProfile>
+        <formCompleteProfile @profileCompleteSuccess="dialogVisible = false"></formCompleteProfile>
       </DialogView>
     </v-main>
   </v-app>
 </template>
 
 <script setup>
-  import { ref } from 'vue';
+  import { ref, watch } from 'vue';
   import formCompleteProfile from '../forms/formCompleteProfile.vue'
   import DialogView from '../dialog/DialogView.vue'
   import { useAuthStore } from '@/stores/auth.js'
+  import {userUseStore} from '@/stores/user.js'
 
+  const userStore = userUseStore()
   const store = useAuthStore()
   const dialogVisible = ref(false)
   const drawer = ref(false)
@@ -170,6 +176,7 @@
 
 
   const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord)
+
   const appointments = ref([
     {
       date: 'Segunda-feira',
