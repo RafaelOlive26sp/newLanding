@@ -1,15 +1,15 @@
 <template>
   <v-app :theme="theme">
     <!-- Navigation Drawer -->
-    <v-navigation-drawer v-model="drawer" app temporary color="grey-lighten-4">
+    <v-navigation-drawer v-model="drawer" app color="grey-lighten-4" temporary>
       <v-list>
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-title class="text-h6">{{ user.name }}</v-list-item-title>
-            <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+            <v-list-item-title class="text-h6">{{ profileNavigation.name }}</v-list-item-title>
+            <v-list-item-subtitle>{{ profileNavigation.greenting }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-        <v-divider></v-divider>
+        <v-divider />
         <v-list-item @click="showPayments = true">
           <v-list-item-title>Pagamentos</v-list-item-title>
         </v-list-item>
@@ -19,11 +19,12 @@
       </v-list>
     </v-navigation-drawer>
 
+
     <!-- App Bar -->
     <v-app-bar app color="teal-darken-1" dark>
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title>Área do Aluno</v-toolbar-title>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn icon @click="toggleTheme">
         <v-icon>{{ theme === 'light' ? 'mdi-weather-night' : 'mdi-white-balance-sunny' }}</v-icon>
       </v-btn>
@@ -32,14 +33,23 @@
     <!-- Main Content -->
     <v-main>
       <!-- Profile Incomplete Alert -->
-      <v-alert v-if="!ifCompleteProfile " type="warning" color="amber-darken-2" class="ma-4"
-        @click="dialogsHome(item, 'profileComplete')" clickable>
+      <v-alert
+        v-if="!ifCompleteProfile "
+        class="ma-4"
+        clickable
+        color="amber-darken-2"
+        type="warning"
+        @click="dialogsHome(item, 'profileComplete')"
+      >
         Complete seu cadastro aqui!
       </v-alert>
+      {{ store.user }}
 
       <!-- Parallax Header -->
-      <v-parallax src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80"
-        height="350">
+      <v-parallax
+        height="350"
+        src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80"
+      >
         <div class="d-flex flex-column align-center justify-center h-100">
           <h1 class="text-h4 font-weight-bold white--text">Bem-vindo ao seu espaço !</h1>
           <p class="text-subtitle-1 white--text">Foco, saúde e atenção personalizada.</p>
@@ -52,23 +62,29 @@
           <div v-if="showAppointments">
             <h2 class="text-h5 teal--text text--darken-1 mb-4">Meus Agendamentos</h2>
             <v-row>
-              <v-col v-for="(appointment, i) in appointments" :key="i" cols="12" sm="6" md="4">
+              <v-col
+                v-for="(appointment, i) in appointments"
+                :key="i"
+                cols="12"
+                md="4"
+                sm="6"
+              >
                 <v-card class="pa-4" color="grey-lighten-4" elevation="2" rounded="lg">
                   <v-card-title class="text-h6 teal--text text--darken-1">
-                    <v-icon left color="teal">mdi-calendar</v-icon>
+                    <v-icon color="teal" left>mdi-calendar</v-icon>
                     {{ appointment.date }}
                   </v-card-title>
                   <v-card-text>
                     <p class="mb-1">
-                      <v-icon small left color="teal">mdi-clock-outline</v-icon>
+                      <v-icon color="teal" left small>mdi-clock-outline</v-icon>
                       <strong>Horário:</strong> {{ appointment.time }}
                     </p>
                     <p class="mb-1">
-                      <v-icon small left color="teal">mdi-account-group</v-icon>
+                      <v-icon color="teal" left small>mdi-account-group</v-icon>
                       <strong>Turma:</strong> {{ appointment.group }}
                     </p>
                     <p>
-                      <v-icon small left color="teal">mdi-star</v-icon>
+                      <v-icon color="teal" left small>mdi-star</v-icon>
                       <strong>Nível:</strong> {{ appointment.level }}
                     </p>
                   </v-card-text>
@@ -100,19 +116,25 @@
               </v-list-item>
             </v-list>
             <!-- Mensagem de Nenhum Pagamento -->
-            <v-alert v-else type="info" color="teal-lighten-3" class="mb-4">
+            <v-alert v-else class="mb-4" color="teal-lighten-3" type="info">
               Nenhum pagamento encontrado
             </v-alert>
 
             <!-- Seleção do Método de Pagamento -->
-            <v-select v-model="selectedPaymentMethod" label="Método de Pagamento" :items="paymentMethods" outlined dense
-              class="mb-4"></v-select>
+            <v-select
+              v-model="selectedPaymentMethod"
+              class="mb-4"
+              dense
+              :items="paymentMethods"
+              label="Método de Pagamento"
+              outlined
+            />
 
             <!-- Resultado do Pagamento -->
             <v-expand-transition>
               <div v-if="paymentResult">
-                <v-card flat class="text-center pa-4">
-                  <v-icon v-if="selectedPaymentMethod === 'PIX'" size="100" color="teal">
+                <v-card class="text-center pa-4" flat>
+                  <v-icon v-if="selectedPaymentMethod === 'PIX'" color="teal" size="100">
                     mdi-qrcode
                   </v-icon>
                   <p v-if="selectedPaymentMethod === 'PIX'" class="mt-2">
@@ -126,9 +148,13 @@
             </v-expand-transition>
           </v-card-text>
           <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn :color="selectedPaymentMethod === 'PIX' ? 'teal-darken-1' : 'teal-darken-1'" dark
-              @click="generatePayment" :disabled="!selectedPaymentMethod">
+            <v-spacer />
+            <v-btn
+              :color="selectedPaymentMethod === 'PIX' ? 'teal-darken-1' : 'teal-darken-1'"
+              dark
+              :disabled="!selectedPaymentMethod"
+              @click="generatePayment"
+            >
               {{ selectedPaymentMethod === 'PIX' ? 'Gerar QR Code PIX' : 'Gerar Boleto' }}
             </v-btn>
             <v-btn text @click="closePaymentsDialog">Fechar</v-btn>
@@ -137,10 +163,10 @@
       </v-dialog>
 
       <DialogView v-model="dialogVisible" max-width="500">
-        <formCompleteProfile @profileCompleteSuccess="profileCompleteSuccess()"></formCompleteProfile>
+        <formCompleteProfile @profile-complete-success="profileCompleteSuccess()" />
       </DialogView>
 
-      <snackBarView v-model="snackBarVisible" :textContent="snackBarMessage" >
+      <snackBarView v-model="snackBarVisible" :text-content="snackBarMessage">
         <template #actions>
           <v-btn color="pink" variant="text" @click="snackBarVisible = false">
             Fechar
@@ -152,11 +178,10 @@
 </template>
 
 <script setup>
-  import { ref} from 'vue';
+  import { ref } from 'vue';
   import formCompleteProfile from '../forms/formCompleteProfile.vue'
   import DialogView from '../dialog/DialogView.vue'
   import { useAuthStore } from '@/stores/auth.js'
-
 
 
   const store = useAuthStore()
@@ -170,11 +195,15 @@
   const paymentResult = ref(null)
   const snackBarMessage = ref('')
   const snackBarVisible = ref(false)
-
-  const user = ref({
-    name: 'João Silva',
-    email: 'joao.silva@email.com',
+  const profileNavigation = ref({
+    name: store.user?.name,
+    greenting: 'Seja bem vindo(a)',
   })
+
+  // const user = ref({
+  //   name: 'João Silva',
+  //   email: 'joao.silva@email.com',
+  // })
 
 
   const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord)
@@ -208,14 +237,13 @@
   ])
 
 
-
   const toggleTheme = () => {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
   }
 
-  const dialogsHome = async(item, type ) => {
+  const dialogsHome = async (item, type) => {
     isProfileComplete.value = true // se for true o alert de complete sua conta sera aberto
-    if(type === 'profileComplete'){
+    if (type === 'profileComplete') {
       dialogVisible.value = true
     }
   }
@@ -242,7 +270,7 @@
 </script>
 
 <style scoped>
-.v-parallax>div {
+.v-parallax > div {
   background-color: rgba(0, 0, 0, 0.5);
   text-align: center;
   padding: 20px;
