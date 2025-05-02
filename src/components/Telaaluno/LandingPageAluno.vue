@@ -37,12 +37,6 @@
         Complete seu cadastro aqui!
       </v-alert>
 
-      {{ ifCompleteProfile }}
-
-
-
-
-
       <!-- Parallax Header -->
       <v-parallax src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80"
         height="350">
@@ -142,32 +136,40 @@
         </v-card>
       </v-dialog>
 
-
       <DialogView v-model="dialogVisible" max-width="500">
-        <formCompleteProfile @profileCompleteSuccess="dialogVisible = false"></formCompleteProfile>
+        <formCompleteProfile @profileCompleteSuccess="profileCompleteSuccess()"></formCompleteProfile>
       </DialogView>
+
+      <snackBarView v-model="snackBarVisible" :textContent="snackBarMessage" >
+        <template #actions>
+          <v-btn color="pink" variant="text" @click="snackBarVisible = false">
+            Fechar
+          </v-btn>
+        </template>
+      </snackBarView>
     </v-main>
   </v-app>
 </template>
 
 <script setup>
-  import { ref, watch } from 'vue';
+  import { ref} from 'vue';
   import formCompleteProfile from '../forms/formCompleteProfile.vue'
   import DialogView from '../dialog/DialogView.vue'
   import { useAuthStore } from '@/stores/auth.js'
-  import {userUseStore} from '@/stores/user.js'
 
-  const userStore = userUseStore()
+
+
   const store = useAuthStore()
   const dialogVisible = ref(false)
   const drawer = ref(false)
   const showPayments = ref(false)
   const showAppointments = ref(false)
-  // const showProfileForm = ref(false)
   const theme = ref('light')
   const isProfileComplete = ref(false)
   const selectedPaymentMethod = ref(null)
   const paymentResult = ref(null)
+  const snackBarMessage = ref('')
+  const snackBarVisible = ref(false)
 
   const user = ref({
     name: 'João Silva',
@@ -213,24 +215,22 @@
 
   const dialogsHome = async(item, type ) => {
     isProfileComplete.value = true // se for true o alert de complete sua conta sera aberto
-    // dialogVisible.value = true
-
-
-    console.log(`item: ${item} -   tipo: ${type} `);
-
     if(type === 'profileComplete'){
       dialogVisible.value = true
     }
-
-
   }
-
   const generatePayment = () => {
     if (selectedPaymentMethod.value === 'PIX') {
       paymentResult.value = '[Simulação de QR Code PIX]'
     } else if (selectedPaymentMethod.value === 'Boleto Bancário') {
       paymentResult.value = '1234 5678 9012 3456 7890 1234 5678 9012 3456'
     }
+  }
+
+  const profileCompleteSuccess = () => {
+    snackBarVisible.value = true
+    dialogVisible.value = false
+    snackBarMessage.value = 'Cadastro completo com sucesso!'
   }
 
   const closePaymentsDialog = () => {
