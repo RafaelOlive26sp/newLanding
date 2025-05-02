@@ -50,8 +50,9 @@
   import { ref} from 'vue';
   import {completeUser as completeUserApi} from '@/services/user'
   import { userUseStore } from '@/stores/user'
+import { login } from '@/services/auth';
 
-  const emit = defineEmits(['profileComplete'])
+  const emit = defineEmits(['profileCompleteSuccess'])
   const userStore = userUseStore()
   const profile = ref({
 
@@ -90,10 +91,12 @@
 
     try {
       const response = await completeUserApi(dataForm)
+        // console.log('dados retornados de service ',response);
+
       userStore.completeProfileUser(response)
       if (response.status === 201) {
-        // emit('profileComplete')
-        console.log(response.status);
+        emit('profileCompleteSuccess')
+        console.log('dentro do if da view form ',response.status);
 
       }
 
