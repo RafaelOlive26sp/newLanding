@@ -5,8 +5,8 @@
       <v-list>
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-title class="text-h6">{{ user.name }}</v-list-item-title>
-            <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+            <v-list-item-title class="text-h6">{{ profileNavigation.name }}</v-list-item-title>
+            <v-list-item-subtitle>{{ profileNavigation.greenting }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
         <v-divider></v-divider>
@@ -18,6 +18,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
+
 
     <!-- App Bar -->
     <v-app-bar app color="teal-darken-1" dark>
@@ -36,6 +37,7 @@
         @click="dialogsHome(item, 'profileComplete')" clickable>
         Complete seu cadastro aqui!
       </v-alert>
+      {{store.user}}
 
       <!-- Parallax Header -->
       <v-parallax src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80"
@@ -170,11 +172,15 @@
   const paymentResult = ref(null)
   const snackBarMessage = ref('')
   const snackBarVisible = ref(false)
-
-  const user = ref({
-    name: 'João Silva',
-    email: 'joao.silva@email.com',
+  const profileNavigation = ref({
+    name: store.user?.name,
+    greenting: 'Seja bem vindo(a)',
   })
+
+  // const user = ref({
+  //   name: 'João Silva',
+  //   email: 'joao.silva@email.com',
+  // })
 
 
   const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord)
