@@ -43,7 +43,6 @@
       >
         Complete seu cadastro aqui!
       </v-alert>
-      {{ store.user }}
 
       <!-- Parallax Header -->
       <v-parallax
@@ -163,7 +162,7 @@
       </v-dialog>
 
       <DialogView v-model="dialogVisible" max-width="500">
-        <formCompleteProfile @profile-complete-success="profileCompleteSuccess()" />
+        <formCompleteProfile @error-form-students="errorFormStudentsCreate" @profile-complete-success="profileCompleteSuccess()" />
       </DialogView>
 
       <snackBarView v-model="snackBarVisible" :text-content="snackBarMessage">
@@ -178,12 +177,14 @@
 </template>
 
 <script setup>
+  import { useRouter } from 'vue-router';
   import { ref } from 'vue';
   import formCompleteProfile from '../forms/formCompleteProfile.vue'
   import DialogView from '../dialog/DialogView.vue'
   import { useAuthStore } from '@/stores/auth.js'
+  import { logout as logoutApi } from '@/services/auth'
 
-
+  const router = useRouter()
   const store = useAuthStore()
   const dialogVisible = ref(false)
   const drawer = ref(false)
@@ -265,6 +266,33 @@
     showPayments.value = true
     selectedPaymentMethod.value = null
     paymentResult.value = null
+  }
+  const errorFormStudentsCreate = status => {
+
+    if (status !== 409) {
+      snackBarVisible.value = true
+      snackBarMessage.value = 'Preencha todos os campos obrigatórios!'
+
+    }
+    if (status === 409) {
+      dialogVisible.value = false
+
+      snackBarVisible.value = true
+      snackBarMessage.value = 'O Usuario já está com o perfil Completo.!'
+      setTimeout(() => {
+        handleLogout()
+      },4000)
+    }
+  }
+  const handleLogout = async () => {
+    try {
+      const response = await logoutApi()
+
+      store.logout(response)
+      await router.push('/login')
+    } catch (error) {
+      console.error('Error ao fazer o Logout ', error)
+    }
   }
 
 </script>
