@@ -14,14 +14,10 @@ export const useAuthStore = defineStore('auth',{
   actions:{
     async login( response ) {
       try {
-
-        console.log('----- ',response);
-
         this.token = response.access_token; // Acesse diretamente access_token
         this.user = response.user; // Acesse diretamente user
         Cookies.set('access_token', response.access_token,{secure:true, sameSite:'Strict'}); // Use access_token
         localStorage.setItem('user', JSON.stringify(response.user));
-
       } catch (error) {
         console.error(error);
         // throw new Error(error, 'Error logging in');
