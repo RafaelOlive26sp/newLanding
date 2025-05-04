@@ -10,7 +10,7 @@
           </v-list-item-content>
         </v-list-item>
         <v-divider />
-        <v-list-item @click="showPayments = true">
+        <v-list-item @click="showPayments = true, payments()">
           <v-list-item-title>Pagamentos</v-list-item-title>
         </v-list-item>
         <v-list-item @click="showAppointments = !showAppointments">
@@ -100,13 +100,15 @@
           <v-card-title class="text-h6 teal--text text--darken-1">
             Meus Pagamentos
           </v-card-title>
+
+          {{ useStore.errorMessagePayment }}
           <v-card-text>
             <!-- Lista de Pagamentos Pendentes -->
             <v-list v-if="pendingPayments.length > 0" class="mb-4">
               <v-list-item v-for="(payment, i) in pendingPayments" :key="i">
                 <v-list-item-content>
                   <v-list-item-title>
-                    Pagamento #{{ i + 1 }} - R$ {{ payment.amount }}
+                    Pagamento #{{ i + 1 }} - R$ {{ payment.amount }} kl
                   </v-list-item-title>
                   <v-list-item-subtitle>
                     Vencimento: {{ payment.dueDate }}
@@ -183,7 +185,10 @@
   import DialogView from '../dialog/DialogView.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { logout as logoutApi } from '@/services/auth'
+  import { getPayments as getPaymentsApi } from '@/services/user'
+  import { userUseStore } from '@/stores/user.js';
 
+  const useStore = userUseStore()
   const router = useRouter()
   const store = useAuthStore()
   const dialogVisible = ref(false)
@@ -201,13 +206,12 @@
     greenting: 'Seja bem vindo(a)',
   })
 
-  // const user = ref({
-  //   name: 'João Silva',
-  //   email: 'joao.silva@email.com',
-  // })
 
-
+  onMounted(() => {
+    // payments()
+  })
   const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord)
+  const userId = computed(() => store.user?.id)
 
   const appointments = ref([
     {
@@ -292,6 +296,19 @@
       await router.push('/login')
     } catch (error) {
       console.error('Error ao fazer o Logout ', error)
+    }
+  }
+  const payments = async () => {
+    const id = userId.value
+    // console.log('id', id);
+
+    try {
+      const response = await getPaymentsApi(id)
+      console.log('Pagamentos:', response)
+      useStore.payments(response)
+    } catch (error) {
+      console.error('Erro ao buscar pagamentos:', error.response.data.message)
+      useStore.errorPayments(error.response.data.message)
     }
   }
 
