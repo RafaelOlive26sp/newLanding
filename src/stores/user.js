@@ -5,6 +5,8 @@ export const userUseStore = defineStore('user',{
   state:()=>({
     completeProfile:[],
     responseCadastro:[],
+    responseGetPayment:[],
+    errorMessagePayment:[],
 
   }),
   getters:{
@@ -34,7 +36,22 @@ export const userUseStore = defineStore('user',{
         console.log(error);
 
       }
+    },
+    async payments(response){
+      try {
+        this.responseGetPayment = response
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async errorPayments(response){
+      try {
+        this.errorMessagePayment = typeof response === 'string' ? response : 'Erro desconhecido ao buscar os pagamentos.'
+      } catch (error) {
+        console.log(error)
+      }
     }
+
   }
 })
 
