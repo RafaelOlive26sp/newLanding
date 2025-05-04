@@ -19,7 +19,7 @@ export const registerUser = async (data) => {
 };
 export const getPayments = async (data) => {
   const getToken = Cookies.get("access_token");
-    console.log('estamos antes da chamada para a api ',data);
+    // console.log('estamos antes da chamada para a api ',data);
 
   const response = await api.get(`/api/v1/payment/${data}`, {
     headers: {
@@ -29,3 +29,12 @@ export const getPayments = async (data) => {
 
   return response.data;
 };
+export const handlePayment = async (data) => {
+  const getToken = Cookies.get("access_token");
+  const response = await api.post("/api/v1/payment/", data, {
+    headers: {
+      Authorization: `Bearer ${getToken}`,
+    },
+  });
+  return response.data;
+}
