@@ -6,7 +6,7 @@ export const userUseStore = defineStore('user',{
   state:()=>({
     completeProfile:[],
     responseCadastro:[],
-    responseGetPayment:[],
+    responseGetPayment:{},
     errorMessagePayment:[],
     responsePaymentSuccess:[],
 
