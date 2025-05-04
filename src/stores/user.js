@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from '@/stores/auth';
+import { handlePayment } from "@/services/user";
 
 export const userUseStore = defineStore('user',{
   state:()=>({
@@ -7,6 +8,7 @@ export const userUseStore = defineStore('user',{
     responseCadastro:[],
     responseGetPayment:[],
     errorMessagePayment:[],
+    responsePaymentSuccess:[],
 
   }),
   getters:{
@@ -46,9 +48,19 @@ export const userUseStore = defineStore('user',{
     },
     async errorPayments(response){
       try {
-        this.errorMessagePayment = typeof response === 'string' ? response : 'Erro desconhecido ao buscar os pagamentos.'
+        this.errorMessagePayment = response
       } catch (error) {
         console.log(error)
+      }
+    },
+    async handlePayments(response){
+      try {
+        // console.log(`Dados recebidos pela api ${response}`);
+
+          this.responsePaymentSuccess = response
+      } catch (error) {
+        console.log(error);
+
       }
     }
 
