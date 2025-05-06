@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from '@/stores/auth';
-import { handlePayment } from "@/services/user";
+// import { getAppointments, handlePayment } from "@/services/user";
 
 export const userUseStore = defineStore('user',{
   state:()=>({
@@ -9,6 +9,8 @@ export const userUseStore = defineStore('user',{
     responseGetPayment:{},
     errorMessagePayment:[],
     responsePaymentSuccess:[],
+    errorMessages:[],
+    responseGetAppointments:[],
 
   }),
   getters:{
@@ -62,9 +64,20 @@ export const userUseStore = defineStore('user',{
         console.log(error);
 
       }
-    }
+    },
+    async getAppointmentsStore(response){
+      try {
+        this.responseGetAppointments = response
+        console.log(response);
+
+      } catch (error) {
+        // console.log('estamos dentro de store na funcao error ',error.response);
+
+        this.errorMessages = error.response
+
+
+      }
+    },
 
   }
 })
-
-
