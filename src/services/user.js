@@ -38,3 +38,15 @@ export const handlePayment = async (data) => {
   });
   return response.data;
 }
+export const getAppointments = async (data) => {
+  const getToken = Cookies.get("access_token");
+  const getUserId = JSON.parse(localStorage.getItem('user')).id
+  // console.log('getUser',getUser);
+
+  const response = await api.get(`/api/v1/clschedule/${getUserId}`, {
+    headers: {
+      Authorization: `Bearer ${getToken}`,
+    },
+  });
+  return response.data;
+}
