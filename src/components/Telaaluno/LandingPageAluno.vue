@@ -17,7 +17,7 @@
         <v-list-item @click="(showPayments = true), payments()">
           <v-list-item-title>Pagamentos</v-list-item-title>
         </v-list-item>
-        <v-list-item @click="showAppointments = !showAppointments">
+        <v-list-item @click="(showAppointments = !showAppointments), getAppointmentsUser()">
           <v-list-item-title>Meus Agendamentos</v-list-item-title>
         </v-list-item>
       </v-list>
@@ -63,9 +63,21 @@
             <h2 class="text-h5 teal--text text--darken-1 mb-4">
               Meus Agendamentos
             </h2>
-            <v-row>
-              <v-col v-for="(appointment, i) in appointments" :key="i" cols="12" md="4" sm="6">
+            <prev>
+
+              <!-- {{ responseAppointments.data }} -->
+            </prev>
+            <!-- {{ responseAppointments.message }} -->
+            <v-alert  v-if="responseAppointments.status === 404" border="top"  type="warning" variant="outlined" prominent >
+              {{ responseAppointments.message }}
+            </v-alert>
+            <v-row v-else>
+              <v-col v-for="(appointment, i) in responseAppointments[0].classe.schedules_patterns" :key="i" cols="12" md="4" sm="6">
                 <v-card class="pa-4" color="grey-lighten-4" elevation="2" rounded="lg">
+                  <pre>
+
+                    <!-- {{responseAppointments[0].classe.schedules_patterns}} -->
+                  </pre>
                   <v-card-title class="text-h6 teal--text text--darken-1">
                     <v-icon color="teal" left>mdi-calendar</v-icon>
                     {{ appointment.date }}
@@ -73,15 +85,15 @@
                   <v-card-text>
                     <p class="mb-1">
                       <v-icon color="teal" left small>mdi-clock-outline</v-icon>
-                      <strong>Horário:</strong> {{ appointment.time }}
+                      <strong>Horário:</strong> {{ appointment }}
                     </p>
                     <p class="mb-1">
                       <v-icon color="teal" left small>mdi-account-group</v-icon>
-                      <strong>Turma:</strong> {{ appointment.group }}
+                      <strong>Turma:</strong> {{ appointment.classe.name }}
                     </p>
                     <p>
                       <v-icon color="teal" left small>mdi-star</v-icon>
-                      <strong>Nível:</strong> {{ appointment.level }}
+                      <strong>Nível:</strong> {{ appointment.classe.level }}
                     </p>
                   </v-card-text>
                 </v-card>
@@ -102,8 +114,8 @@
 
           <v-card-text>
             <!-- Lista de Pagamentos Pendentes -->
-             <!-- {{useStore.responseGetPayment.data}} -->
-              <!-- {{ dataPayments }} -->
+            <!-- {{useStore.responseGetPayment.data}} -->
+            <!-- {{ dataPayments }} -->
             <v-list v-if="notPayments.status !== ''" class="mb-4">
               <v-list-item v-for="(payment, i) in dataPayments" :key="i">
                 <v-list-item-content>
@@ -113,8 +125,9 @@
                   <v-list-item-subtitle>
                     Vencimento: {{ payment.due_date }}
                   </v-list-item-subtitle>
-                  <v-list-item-subtitle >
-                    Status: {{ payment.status }}
+                  <v-list-item-subtitle>
+                    Status: <span class="text-yellow-darken-3 text-overline font-weight-black">{{ payment.status }}
+                    </span>
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
@@ -126,40 +139,31 @@
             </v-alert>
 
             <!-- Seleção do Método de Pagamento -->
-            <v-select v-model="selectedPaymentMethod" class="mb-4" dense :items="paymentMethods" v-if="!isProcessing && notPayments.status === ''"
-              label="Método de Pagamento" outlined />
+            <v-select v-model="selectedPaymentMethod" class="mb-4" dense :items="paymentMethods"
+              v-if="!isProcessing && notPayments.status === ''" label="Método de Pagamento" outlined />
 
             <!-- Campo de Valor do Pagamento -->
             <v-text-field v-if="selectedPaymentMethod == 'PIX'" outlined v-model="paymentAmount" class="mb-4" dense
               label="Valor do Pagamento" prefix="R$" type="number" :rules="[rules.required, rules.min]" />
 
-              <!-- Loader de Processamento do pagamento -->
+            <!-- Loader de Processamento do pagamento -->
 
-                <div class="d-flex justify-center my-6" v-if="isProcessing">
-                  <v-progress-circular
-                    indeterminate
-                    color="teal"
-                    size="64"
-                  />
-                </div>
+            <div class="d-flex justify-center my-6" v-if="isProcessing">
+              <v-progress-circular indeterminate color="teal" size="64" />
+            </div>
 
-                <!-- Tela de Sucesso do pagamento -->
+            <!-- Tela de Sucesso do pagamento -->
 
-                  <div class="text-center" v-if="paymentSuccess">
-                    <v-img
-                      src="https://cdn-icons-png.flaticon.com/512/190/190411.png"
-                      alt="Pagamento realizado"
-                      contain
-                      max-width="100"
-                      class="mx-auto mb-4"
-                    />
-                    <div class="text-h6 font-weight-medium">
-                      Pagamento gerado com sucesso!
-                    </div>
-                    <div class="text-body-2 mt-1">
-                      Em breve vamos verificar o seu pagamento.
-                    </div>
-                  </div>
+            <div class="text-center" v-if="paymentSuccess">
+              <v-img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Pagamento realizado" contain
+                max-width="100" class="mx-auto mb-4" />
+              <div class="text-h6 font-weight-medium">
+                Pagamento gerado com sucesso!
+              </div>
+              <div class="text-body-2 mt-1">
+                Em breve vamos verificar o seu pagamento.
+              </div>
+            </div>
 
 
           </v-card-text>
@@ -199,173 +203,193 @@
 
 <script setup>
 
-  import { useRouter } from "vue-router";
-  import { ref } from "vue";
-  import formCompleteProfile from "../forms/formCompleteProfile.vue";
-  import DialogView from "../dialog/DialogView.vue";
-  import { useAuthStore } from "@/stores/auth.js";
-  import { logout as logoutApi } from "@/services/auth";
-  import { getPayments as getPaymentsApi,
-          handlePayment as handlePaymentAPI,
-  } from "@/services/user";
-  import { userUseStore } from "@/stores/user.js";
+import { useRouter } from "vue-router";
+import { ref } from "vue";
+import formCompleteProfile from "../forms/formCompleteProfile.vue";
+import DialogView from "../dialog/DialogView.vue";
+import { useAuthStore } from "@/stores/auth.js";
+import { logout as logoutApi } from "@/services/auth";
+import {
+  getPayments as getPaymentsApi,
+  handlePayment as handlePaymentAPI,
+  getAppointments as getAppointmentsAPI,
+} from "@/services/user";
+import { userUseStore } from "@/stores/user.js";
 
-  const useStore = userUseStore();
-  const router = useRouter();
-  const store = useAuthStore();
-  const dialogVisible = ref(false);
-  const drawer = ref(false);
-  const showPayments = ref(false);
-  const showAppointments = ref(false);
-  const theme = ref("light");
-  const isProfileComplete = ref(false);
-  const selectedPaymentMethod = ref(null);
-  const paymentResult = ref(null);
-  const snackBarMessage = ref("");
-  const snackBarVisible = ref(false);
-  const profileNavigation = ref({
-    name: store.user?.name,
-    greenting: "Seja bem vindo(a)",
-  });
-  const rules = {
-    required: (value) => !!value || "Campo obrigatório",
-    min: (v) => (v && v.length >= 3) || "Mínimo de 3 caracteres",
-    max: (v) => (v && v.length <= 10) || "Máximo de 10 caracteres",
-  };
-  const paymentAmount = ref(null);
-  const isProcessing = ref(false); // progress cicle, tem que ser ativado quando o pagamento for solicitado
-  const paymentSuccess = ref(false); // mensagem de sucessso
-  const datasPayments = ref({})
+const useStore = userUseStore();
+const router = useRouter();
+const store = useAuthStore();
+
+const dialogVisible = ref(false);
+const drawer = ref(false);
+const showPayments = ref(false);
+const showAppointments = ref(false);
+const theme = ref("light");
+const isProfileComplete = ref(false);
+const selectedPaymentMethod = ref(null);
+const paymentResult = ref(null);
+const snackBarMessage = ref("");
+const snackBarVisible = ref(false);
+const profileNavigation = ref({
+  name: store.user?.name,
+  greenting: "Seja bem vindo(a)",
+});
+const rules = {
+  required: (value) => !!value || "Campo obrigatório",
+  min: (v) => (v && v.length >= 3) || "Mínimo de 3 caracteres",
+  max: (v) => (v && v.length <= 10) || "Máximo de 10 caracteres",
+};
+const paymentAmount = ref(null);
+const isProcessing = ref(false); // progress cicle, tem que ser ativado quando o pagamento for solicitado
+const paymentSuccess = ref(false); // mensagem de sucessso
+const datasPayments = ref({})
 
 
-  const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord);
-  const userId = computed(() => store.user?.id);
-  const notPayments = computed(() => useStore.errorMessagePayment);
+const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord);
+const userId = computed(() => store.user?.id);
+const notPayments = computed(() => useStore.errorMessagePayment);
+const dataPayments = computed(() => { return useStore.responseGetPayment });
+const errorMessages = computed(() => useStore.errorMessages);
+const responseAppointments = computed(() => useStore.responseGetAppointments.data);
 
-  const appointments = ref([
-    {
-      date: "Segunda-feira",
-      time: "07:00 às 08:00",
-      group: "turma 1",
-      level: "beginner",
-    },
-    {
-      date: "Quarta-feira",
-      time: "16:00 às 17:00",
-      group: "turma 1",
-      level: "beginner",
-    },
-    {
-      date: "Sexta-feira",
-      time: "20:00 às 21:00",
-      group: "turma 1",
-      level: "beginner",
-    },
-  ]);
+const appointments = ref([
+  {
+    date: "Segunda-feira",
+    time: "07:00 às 08:00",
+    group: "turma 1",
+    level: "beginner",
+  },
+  {
+    date: "Quarta-feira",
+    time: "16:00 às 17:00",
+    group: "turma 1",
+    level: "beginner",
+  },
+  {
+    date: "Sexta-feira",
+    time: "20:00 às 21:00",
+    group: "turma 1",
+    level: "beginner",
+  },
+]);
 
-  const paymentMethods = ref(["PIX", "Boleto Bancário"]);
+const paymentMethods = ref(["PIX", "Boleto Bancário"]);
 
-  const pendingPayments = ref([
-    { amount: "150,00", dueDate: "30/04/2025" },
-    { amount: "150,00", dueDate: "30/05/2025" },
-  ]);
+const pendingPayments = ref([
+  { amount: "150,00", dueDate: "30/04/2025" },
+  { amount: "150,00", dueDate: "30/05/2025" },
+]);
 
-  const toggleTheme = () => {
-    theme.value = theme.value === "light" ? "dark" : "light";
-  };
-  const dialogsHome = async (item, type) => {
+const toggleTheme = () => {
+  theme.value = theme.value === "light" ? "dark" : "light";
+};
+const dialogsHome = async (item, type) => {
   isProfileComplete.value = true; // se for true o alert de complete sua conta sera aberto
   if (type === "profileComplete") {
     dialogVisible.value = true;
   }
-  };
-  const generatePayment = async () => {
-    isProcessing.value = true; // Ativa o loader de processamento
-    if (isProcessing.value) {
-      selectedPaymentMethod.value = null;
-    }
-    try {
-      // console.log(paymentAmount.value);
-      const inputAmount = {
-        amount: paymentAmount.value,
-      }
-
-      const response = await handlePaymentAPI(inputAmount)
-      // console.log('resposta da api ',response)
-      useStore.handlePayments(response)
-      if (response.status !== '') {
-        paymentMessageSuccess()
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  };
-  const paymentMessageSuccess = () =>{
-    isProcessing.value = false
-    paymentSuccess.value = true
-    setTimeout(()=>{
-      showPayments.value = false
-    },3000)
-  }
-
-  const profileCompleteSuccess = () => {
-    snackBarVisible.value = true;
-    dialogVisible.value = false;
-    snackBarMessage.value = "Cadastro completo com sucesso!";
-  };
-
-  const closePaymentsDialog = () => {
-    showPayments.value = true;
+};
+const generatePayment = async () => {
+  isProcessing.value = true; // Ativa o loader de processamento
+  if (isProcessing.value) {
     selectedPaymentMethod.value = null;
-    paymentResult.value = null;
-  };
-  const errorFormStudentsCreate = (status) => {
-    if (status !== 409) {
-      snackBarVisible.value = true;
-      snackBarMessage.value = "Preencha todos os campos obrigatórios!";
+  }
+  try {
+    // console.log(paymentAmount.value);
+    const inputAmount = {
+      amount: paymentAmount.value,
     }
-    if (status === 409) {
-      dialogVisible.value = false;
 
-      snackBarVisible.value = true;
-      snackBarMessage.value = "O Usuario já está com o perfil Completo.!";
-      setTimeout(() => {
-        handleLogout();
-      }, 4000);
+    const response = await handlePaymentAPI(inputAmount)
+    // console.log('resposta da api ',response)
+    useStore.handlePayments(response)
+    if (response.status !== '') {
+      paymentMessageSuccess()
     }
-  };
-  const handleLogout = async () => {
-    try {
-      const response = await logoutApi();
+  } catch (error) {
+    console.log(error)
+  }
+};
+const paymentMessageSuccess = () => {
+  isProcessing.value = false
+  paymentSuccess.value = true
+  setTimeout(() => {
+    showPayments.value = false
+  }, 3000)
+}
 
-      store.logout(response);
-      await router.push("/login");
-    } catch (error) {
-      console.error("Error ao fazer o Logout ", error);
-    }
-  };
-  const payments = async () => {
-    const id = userId.value;
-    // console.log('id', id);
-    // Recupera os pagamentos
-    try {
-      const response = await getPaymentsApi(id);
-      // console.log("Pagamentos:", response);
-      useStore.payments(response.data);
-    } catch (error) {
-      // console.error("Erro ao buscar pagamentos:", error.response.data.message);
-      const errorResponse = {
-        message: error.response.data.message,
-        status: error.response.status,
-      };
-      // console.log(errorResponse);
-      useStore.errorPayments(errorResponse);
-    }
-  };
-  const dataPayments = computed(() => {
-    return useStore.responseGetPayment;
+const profileCompleteSuccess = () => {
+  snackBarVisible.value = true;
+  dialogVisible.value = false;
+  snackBarMessage.value = "Cadastro completo com sucesso!";
+};
 
-  });
+const closePaymentsDialog = () => {
+  showPayments.value = true;
+  selectedPaymentMethod.value = null;
+  paymentResult.value = null;
+};
+const errorFormStudentsCreate = (status) => {
+  if (status !== 409) {
+    snackBarVisible.value = true;
+    snackBarMessage.value = "Preencha todos os campos obrigatórios!";
+  }
+  if (status === 409) {
+    dialogVisible.value = false;
+
+    snackBarVisible.value = true;
+    snackBarMessage.value = "O Usuario já está com o perfil Completo.!";
+    setTimeout(() => {
+      handleLogout();
+    }, 4000);
+  }
+};
+const handleLogout = async () => {
+  try {
+    const response = await logoutApi();
+
+    store.logout(response);
+    await router.push("/login");
+  } catch (error) {
+    console.error("Error ao fazer o Logout ", error);
+  }
+};
+const payments = async () => {
+  const id = userId.value;
+  // console.log('id', id);
+  // Recupera os pagamentos
+  try {
+    const response = await getPaymentsApi(id);
+    // console.log("Pagamentos:", response);
+    useStore.payments(response.data);
+  } catch (error) {
+    // console.error("Erro ao buscar pagamentos:", error.response.data.message);
+    const errorResponse = {
+      message: error.response.data.message,
+      status: error.response.status,
+    };
+    // console.log(errorResponse);
+    useStore.errorPayments(errorResponse);
+  }
+};
+
+const getAppointmentsUser = async () => {
+  // const id = userId.value;
+  try {
+    const response = await getAppointmentsAPI();
+    // console.log("Agendamentos: estamos na landingPage ", response.data);
+    useStore.getAppointmentsStore(response)
+  } catch (error) {
+    // console.error("Erro ao buscar agendamentos:", error.response.data.message);
+    const dataError = {
+      message: error.response.data.message,
+      status: error.response.status,
+    }
+    // console.log(' estamos na landing ',dataError);
+    useStore.getAppointmentsStore(dataError)
+
+  }
+};
 </script>
 
 <style scoped>
