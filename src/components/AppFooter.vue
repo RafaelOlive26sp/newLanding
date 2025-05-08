@@ -46,7 +46,7 @@
     try{
       const response = await logoutApi()
       AuthStore.logout(response)
-      router.push('/login');
+      router.push('/');
     }catch (error) {
       console.error('Error ao fazer o Logout ',error)
     }
