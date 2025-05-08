@@ -156,8 +156,6 @@
 
           <v-card-text>
             <!-- Lista de Pagamentos Pendentes -->
-            <!-- {{useStore.responseGetPayment.data}} -->
-            <!-- {{ dataPayments }} -->
             <v-list v-if="notPayments.status !== ''" class="mb-4">
               <v-list-item v-for="(payment, i) in dataPayments" :key="i">
                 <v-list-item-content>
@@ -293,7 +291,6 @@
   const dialogVisible = ref(false);
   const drawer = ref(false);
   const showPayments = ref(false);
-  // const showAppointments = ref(false);
   const theme = ref('light');
   const isProfileComplete = ref(false);
   const selectedPaymentMethod = ref(null);
@@ -313,8 +310,6 @@
   const paymentAmount = ref(null);
   const isProcessing = ref(false); // progress cicle, tem que ser ativado quando o pagamento for solicitado
   const paymentSuccess = ref(false); // mensagem de sucessso
-  // const datasPayments = ref({})
-
 
   const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord);
   const userId = computed(() => store.user?.id);
@@ -327,34 +322,7 @@
     getAppointmentsUser();
   });
 
-  // const appointments = ref([
-  //   {
-  //     date: 'Segunda-feira',
-  //     time: '07:00 às 08:00',
-  //     group: 'turma 1',
-  //     level: 'beginner',
-  //   },
-  //   {
-  //     date: 'Quarta-feira',
-  //     time: '16:00 às 17:00',
-  //     group: 'turma 1',
-  //     level: 'beginner',
-  //   },
-  //   {
-  //     date: 'Sexta-feira',
-  //     time: '20:00 às 21:00',
-  //     group: 'turma 1',
-  //     level: 'beginner',
-  //   },
-  // ]);
-
   const paymentMethods = ref(['PIX', 'Boleto Bancário']);
-
-  // const pendingPayments = ref([
-  //   { amount: '150,00', dueDate: '30/04/2025' },
-  //   { amount: '150,00', dueDate: '30/05/2025' },
-  // ]);
-
   const toggleTheme = () => {
     theme.value = theme.value === 'light' ? 'dark' : 'light';
   };
@@ -370,13 +338,10 @@
       selectedPaymentMethod.value = null;
     }
     try {
-      // console.log(paymentAmount.value);
       const inputAmount = {
         amount: paymentAmount.value,
       }
-
       const response = await handlePaymentAPI(inputAmount)
-      // console.log('resposta da api ',response)
       useStore.handlePayments(response)
       if (response.status !== '') {
         paymentMessageSuccess()
@@ -431,36 +396,27 @@
   };
   const payments = async () => {
     const id = userId.value;
-    // console.log('id', id);
-    // Recupera os pagamentos
     try {
       const response = await getPaymentsApi(id);
-      // console.log("Pagamentos:", response);
       useStore.payments(response.data);
     } catch (error) {
-      // console.error("Erro ao buscar pagamentos:", error.response.data.message);
       const errorResponse = {
         message: error.response.data.message,
         status: error.response.status,
       };
-      // console.log(errorResponse);
       useStore.errorPayments(errorResponse);
     }
   };
 
   const getAppointmentsUser = async () => {
-    // const id = userId.value;
     try {
       const response = await getAppointmentsAPI();
-      // console.log("Agendamentos: estamos na landingPage ", response.data);
       useStore.getAppointmentsStore(response)
     } catch (error) {
-      // console.error("Erro ao buscar agendamentos:", error.response.data.message);
       const dataError = {
         message: error.response.data.message,
         status: error.response.status,
       }
-      // console.log(' estamos na landing ',dataError);
       useStore.errorMessages(dataError)
 
     }
