@@ -17,9 +17,9 @@
         <v-list-item @click="(showPayments = true), payments()">
           <v-list-item-title>Pagamentos</v-list-item-title>
         </v-list-item>
-        <v-list-item @click="(showAppointments = !showAppointments), getAppointmentsUser()">
+        <!-- <v-list-item @click="(showAppointments = !showAppointments), getAppointmentsUser()">
           <v-list-item-title>Meus Agendamentos</v-list-item-title>
-        </v-list-item>
+        </v-list-item> -->
       </v-list>
     </v-navigation-drawer>
 
@@ -38,14 +38,22 @@
     <!-- Main Content -->
     <v-main>
       <!-- Profile Incomplete Alert -->
-      <v-alert v-if="!ifCompleteProfile" class="ma-4" clickable color="amber-darken-2" type="warning"
-        @click="dialogsHome(item, 'profileComplete')">
+      <v-alert
+        v-if="!ifCompleteProfile"
+        class="ma-4"
+        clickable
+        color="amber-darken-2"
+        type="warning"
+        @click="dialogsHome(item, 'profileComplete')"
+      >
         Complete seu cadastro aqui!
       </v-alert>
 
       <!-- Parallax Header -->
-      <v-parallax height="350"
-        src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80">
+      <v-parallax
+        height="350"
+        src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1470&q=80"
+      >
         <div class="d-flex flex-column align-center justify-center h-100">
           <h1 class="text-h4 font-weight-bold white--text">
             Bem-vindo ao seu espaço !
@@ -59,7 +67,7 @@
       <!-- Appointments Section -->
       <v-container class="py-6">
         <v-expand-transition>
-          <div v-if="showAppointments">
+          <div>
             <h2 class="text-h5 teal--text text--darken-1 mb-4">
               Meus Agendamentos
             </h2>
@@ -69,38 +77,50 @@
               {{ errorMessagesOther.status }}
             </prev>
             <!-- {{ responseAppointments.message }} -->
-            <v-alert v-if="errorMessagesOther.status"  border="top"  type="warning" variant="outlined" prominent >
+            <v-alert
+              v-if="errorMessagesOther.status"
+              border="top"
+              prominent
+              type="warning"
+              variant="outlined"
+            >
               {{ errorMessagesOther?.message }}
             </v-alert>
             <v-row v-else>
-              {{ responseAppointmentsGet }}
-              <v-col v-for="(appointment, i) in responseAppointmentsGet[0]?.data.classe.schedules_patterns" :key="i" cols="12" md="4" sm="6">
-                <v-card class="pa-4" color="grey-lighten-4" elevation="2" rounded="lg">
-                  <pre>
-
-                    <!-- {{responseAppointments[0].classe.schedules_patterns}} -->
-                  </pre>
-                  <v-card-title class="text-h6 teal--text text--darken-1">
-                    <v-icon color="teal" left>mdi-calendar</v-icon>
-                    {{ appointment.date }}
-                  </v-card-title>
-                  <v-card-text>
-                    <p class="mb-1">
-                      <v-icon color="teal" left small>mdi-clock-outline</v-icon>
-                      <strong>Horário:</strong> {{ appointment }}
-                    </p>
-                    <p class="mb-1">
-                      <v-icon color="teal" left small>mdi-account-group</v-icon>
-                      <strong>Turma:</strong> {{ appointment.classe.name }}
-                    </p>
-                    <p>
-                      <v-icon color="teal" left small>mdi-star</v-icon>
-                      <strong>Nível:</strong> {{ appointment.classe.level }}
-                    </p>
-                  </v-card-text>
-                </v-card>
-              </v-col>
+              <template v-for="(appointment, i) in responseAppointmentsGet.data" :key="appointment.id">
+                <v-col
+                  v-for="(schedule, j) in appointment.classe.schedules_patterns"
+                  :key="`card-${i}-${j}`"
+                  cols="12"
+                  md="4"
+                  sm="6"
+                >
+                  <v-card class="pa-4" color="grey-lighten-4" elevation="2" rounded="lg">
+                    <v-card-title class="text-h6 teal--text text--darken-1">
+                      <v-icon color="teal" left>mdi-calendar</v-icon>
+                      {{ capitalize(schedule.day_of_week) }}
+                    </v-card-title>
+                    <v-card-text>
+                      <p class="mb-1">
+                        <v-icon color="teal" left small>mdi-clock-outline</v-icon>
+                        <strong>Horário:</strong> {{ formatTime(schedule.start_time) }} - {{
+                          formatTime(schedule.end_time) }}
+                      </p>
+                      <p class="mb-1">
+                        <v-icon color="teal" left small>mdi-account-group</v-icon>
+                        <strong>Turma:</strong> {{ appointment.classe.name }}
+                      </p>
+                      <p>
+                        <v-icon color="teal" left small>mdi-star</v-icon>
+                        <strong>Nível:</strong> {{ appointment.classe.level }}
+                      </p>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </template>
             </v-row>
+
+
           </div>
         </v-expand-transition>
       </v-container>
@@ -141,24 +161,45 @@
             </v-alert>
 
             <!-- Seleção do Método de Pagamento -->
-            <v-select v-model="selectedPaymentMethod" class="mb-4" dense :items="paymentMethods"
-              v-if="!isProcessing && notPayments.status === ''" label="Método de Pagamento" outlined />
+            <v-select
+              v-if="!isProcessing && notPayments.status === ''"
+              v-model="selectedPaymentMethod"
+              class="mb-4"
+              dense
+              :items="paymentMethods"
+              label="Método de Pagamento"
+              outlined
+            />
 
             <!-- Campo de Valor do Pagamento -->
-            <v-text-field v-if="selectedPaymentMethod == 'PIX'" outlined v-model="paymentAmount" class="mb-4" dense
-              label="Valor do Pagamento" prefix="R$" type="number" :rules="[rules.required, rules.min]" />
+            <v-text-field
+              v-if="selectedPaymentMethod == 'PIX'"
+              v-model="paymentAmount"
+              class="mb-4"
+              dense
+              label="Valor do Pagamento"
+              outlined
+              prefix="R$"
+              :rules="[rules.required, rules.min]"
+              type="number"
+            />
 
             <!-- Loader de Processamento do pagamento -->
 
-            <div class="d-flex justify-center my-6" v-if="isProcessing">
-              <v-progress-circular indeterminate color="teal" size="64" />
+            <div v-if="isProcessing" class="d-flex justify-center my-6">
+              <v-progress-circular color="teal" indeterminate size="64" />
             </div>
 
             <!-- Tela de Sucesso do pagamento -->
 
-            <div class="text-center" v-if="paymentSuccess">
-              <v-img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Pagamento realizado" contain
-                max-width="100" class="mx-auto mb-4" />
+            <div v-if="paymentSuccess" class="text-center">
+              <v-img
+                alt="Pagamento realizado"
+                class="mx-auto mb-4"
+                contain
+                max-width="100"
+                src="https://cdn-icons-png.flaticon.com/512/190/190411.png"
+              />
               <div class="text-h6 font-weight-medium">
                 Pagamento gerado com sucesso!
               </div>
@@ -172,10 +213,15 @@
 
           <v-card-actions v-if="paymentSuccess.value">
             <v-spacer />
-            <v-btn :color="selectedPaymentMethod === 'PIX'
-              ? 'teal-darken-1'
-              : 'teal-darken-1'
-              " dark :disabled="!selectedPaymentMethod || !paymentAmount" @click="generatePayment">
+            <v-btn
+              :color="selectedPaymentMethod === 'PIX'
+                ? 'teal-darken-1'
+                : 'teal-darken-1'
+              "
+              dark
+              :disabled="!selectedPaymentMethod || !paymentAmount"
+              @click="generatePayment"
+            >
               {{
                 selectedPaymentMethod === "PIX"
                   ? "Gerar QR Code PIX"
@@ -188,8 +234,10 @@
       </v-dialog>
 
       <DialogView v-model="dialogVisible" max-width="500">
-        <formCompleteProfile @error-form-students="errorFormStudentsCreate"
-          @profile-complete-success="profileCompleteSuccess()" />
+        <formCompleteProfile
+          @error-form-students="errorFormStudentsCreate"
+          @profile-complete-success="profileCompleteSuccess()"
+        />
       </DialogView>
 
       <snackBarView v-model="snackBarVisible" :text-content="snackBarMessage">
@@ -205,193 +253,205 @@
 
 <script setup>
 
-import { useRouter } from "vue-router";
-import { ref } from "vue";
-import formCompleteProfile from "../forms/formCompleteProfile.vue";
-import DialogView from "../dialog/DialogView.vue";
-import { useAuthStore } from "@/stores/auth.js";
-import { logout as logoutApi } from "@/services/auth";
-import {
-  getPayments as getPaymentsApi,
-  handlePayment as handlePaymentAPI,
-  getAppointments as getAppointmentsAPI,
-} from "@/services/user";
-import { userUseStore } from "@/stores/user.js";
+  import { useRouter } from 'vue-router';
+  import { onMounted, ref } from 'vue';
+  import formCompleteProfile from '../forms/formCompleteProfile.vue';
+  import DialogView from '../dialog/DialogView.vue';
+  import { useAuthStore } from '@/stores/auth.js';
+  import { logout as logoutApi } from '@/services/auth';
+  import {
+    getAppointments as getAppointmentsAPI,
+    getPayments as getPaymentsApi,
+    handlePayment as handlePaymentAPI,
+  } from '@/services/user';
+  import { userUseStore } from '@/stores/user.js';
 
-const useStore = userUseStore();
-const router = useRouter();
-const store = useAuthStore();
+  const useStore = userUseStore();
+  const router = useRouter();
+  const store = useAuthStore();
 
-const dialogVisible = ref(false);
-const drawer = ref(false);
-const showPayments = ref(false);
-const showAppointments = ref(false);
-const theme = ref("light");
-const isProfileComplete = ref(false);
-const selectedPaymentMethod = ref(null);
-const paymentResult = ref(null);
-const snackBarMessage = ref("");
-const snackBarVisible = ref(false);
-const profileNavigation = ref({
-  name: store.user?.name,
-  greenting: "Seja bem vindo(a)",
-});
-const rules = {
-  required: (value) => !!value || "Campo obrigatório",
-  min: (v) => (v && v.length >= 3) || "Mínimo de 3 caracteres",
-  max: (v) => (v && v.length <= 10) || "Máximo de 10 caracteres",
-};
-const paymentAmount = ref(null);
-const isProcessing = ref(false); // progress cicle, tem que ser ativado quando o pagamento for solicitado
-const paymentSuccess = ref(false); // mensagem de sucessso
-const datasPayments = ref({})
+  const dialogVisible = ref(false);
+  const drawer = ref(false);
+  const showPayments = ref(false);
+  const showAppointments = ref(false);
+  const theme = ref('light');
+  const isProfileComplete = ref(false);
+  const selectedPaymentMethod = ref(null);
+  const paymentResult = ref(null);
+  const snackBarMessage = ref('');
+  const snackBarVisible = ref(false);
+  const profileNavigation = ref({
+    name: store.user?.name,
+    greenting: 'Seja bem vindo(a)',
+  });
+  const rules = {
+    required: value => !!value || 'Campo obrigatório',
+    min: v => (v && v.length >= 3) || 'Mínimo de 3 caracteres',
+    max: v => (v && v.length <= 10) || 'Máximo de 10 caracteres',
+  };
+  const paymentAmount = ref(null);
+  const isProcessing = ref(false); // progress cicle, tem que ser ativado quando o pagamento for solicitado
+  const paymentSuccess = ref(false); // mensagem de sucessso
+  // const datasPayments = ref({})
 
 
-const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord);
-const userId = computed(() => store.user?.id);
-const notPayments = computed(() => useStore.errorMessagePayment);
-const dataPayments = computed(() => { return useStore.responseGetPayment });
-const errorMessagesOther = computed(() => useStore.errorMessageOther);
-const responseAppointmentsGet = computed(() => useStore.responseGetAppointments);
+  const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord);
+  const userId = computed(() => store.user?.id);
+  const notPayments = computed(() => useStore.errorMessagePayment);
+  const dataPayments = computed(() => { return useStore.responseGetPayment });
+  const errorMessagesOther = computed(() => useStore.errorMessageOther);
+  const responseAppointmentsGet = computed(() => useStore.responseGetAppointments);
 
-const appointments = ref([
-  {
-    date: "Segunda-feira",
-    time: "07:00 às 08:00",
-    group: "turma 1",
-    level: "beginner",
-  },
-  {
-    date: "Quarta-feira",
-    time: "16:00 às 17:00",
-    group: "turma 1",
-    level: "beginner",
-  },
-  {
-    date: "Sexta-feira",
-    time: "20:00 às 21:00",
-    group: "turma 1",
-    level: "beginner",
-  },
-]);
+  onMounted(() => {
+    getAppointmentsUser();
+  });
 
-const paymentMethods = ref(["PIX", "Boleto Bancário"]);
+  // const appointments = ref([
+  //   {
+  //     date: 'Segunda-feira',
+  //     time: '07:00 às 08:00',
+  //     group: 'turma 1',
+  //     level: 'beginner',
+  //   },
+  //   {
+  //     date: 'Quarta-feira',
+  //     time: '16:00 às 17:00',
+  //     group: 'turma 1',
+  //     level: 'beginner',
+  //   },
+  //   {
+  //     date: 'Sexta-feira',
+  //     time: '20:00 às 21:00',
+  //     group: 'turma 1',
+  //     level: 'beginner',
+  //   },
+  // ]);
 
-const pendingPayments = ref([
-  { amount: "150,00", dueDate: "30/04/2025" },
-  { amount: "150,00", dueDate: "30/05/2025" },
-]);
+  const paymentMethods = ref(['PIX', 'Boleto Bancário']);
 
-const toggleTheme = () => {
-  theme.value = theme.value === "light" ? "dark" : "light";
-};
-const dialogsHome = async (item, type) => {
-  isProfileComplete.value = true; // se for true o alert de complete sua conta sera aberto
-  if (type === "profileComplete") {
-    dialogVisible.value = true;
-  }
-};
-const generatePayment = async () => {
-  isProcessing.value = true; // Ativa o loader de processamento
-  if (isProcessing.value) {
-    selectedPaymentMethod.value = null;
-  }
-  try {
-    // console.log(paymentAmount.value);
-    const inputAmount = {
-      amount: paymentAmount.value,
+  // const pendingPayments = ref([
+  //   { amount: '150,00', dueDate: '30/04/2025' },
+  //   { amount: '150,00', dueDate: '30/05/2025' },
+  // ]);
+
+  const toggleTheme = () => {
+    theme.value = theme.value === 'light' ? 'dark' : 'light';
+  };
+  const dialogsHome = async (item, type) => {
+    isProfileComplete.value = true; // se for true o alert de complete sua conta sera aberto
+    if (type === 'profileComplete') {
+      dialogVisible.value = true;
     }
-
-    const response = await handlePaymentAPI(inputAmount)
-    // console.log('resposta da api ',response)
-    useStore.handlePayments(response)
-    if (response.status !== '') {
-      paymentMessageSuccess()
+  };
+  const generatePayment = async () => {
+    isProcessing.value = true; // Ativa o loader de processamento
+    if (isProcessing.value) {
+      selectedPaymentMethod.value = null;
     }
-  } catch (error) {
-    console.log(error)
-  }
-};
-const paymentMessageSuccess = () => {
-  isProcessing.value = false
-  paymentSuccess.value = true
-  setTimeout(() => {
-    showPayments.value = false
-  }, 3000)
-}
+    try {
+      // console.log(paymentAmount.value);
+      const inputAmount = {
+        amount: paymentAmount.value,
+      }
 
-const profileCompleteSuccess = () => {
-  snackBarVisible.value = true;
-  dialogVisible.value = false;
-  snackBarMessage.value = "Cadastro completo com sucesso!";
-};
-
-const closePaymentsDialog = () => {
-  showPayments.value = true;
-  selectedPaymentMethod.value = null;
-  paymentResult.value = null;
-};
-const errorFormStudentsCreate = (status) => {
-  if (status !== 409) {
-    snackBarVisible.value = true;
-    snackBarMessage.value = "Preencha todos os campos obrigatórios!";
-  }
-  if (status === 409) {
-    dialogVisible.value = false;
-
-    snackBarVisible.value = true;
-    snackBarMessage.value = "O Usuario já está com o perfil Completo.!";
+      const response = await handlePaymentAPI(inputAmount)
+      // console.log('resposta da api ',response)
+      useStore.handlePayments(response)
+      if (response.status !== '') {
+        paymentMessageSuccess()
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  };
+  const paymentMessageSuccess = () => {
+    isProcessing.value = false
+    paymentSuccess.value = true
     setTimeout(() => {
-      handleLogout();
-    }, 4000);
+      showPayments.value = false
+    }, 3000)
   }
-};
-const handleLogout = async () => {
-  try {
-    const response = await logoutApi();
 
-    store.logout(response);
-    await router.push("/login");
-  } catch (error) {
-    console.error("Error ao fazer o Logout ", error);
-  }
-};
-const payments = async () => {
-  const id = userId.value;
-  // console.log('id', id);
-  // Recupera os pagamentos
-  try {
-    const response = await getPaymentsApi(id);
-    // console.log("Pagamentos:", response);
-    useStore.payments(response.data);
-  } catch (error) {
-    // console.error("Erro ao buscar pagamentos:", error.response.data.message);
-    const errorResponse = {
-      message: error.response.data.message,
-      status: error.response.status,
-    };
-    // console.log(errorResponse);
-    useStore.errorPayments(errorResponse);
-  }
-};
+  const profileCompleteSuccess = () => {
+    snackBarVisible.value = true;
+    dialogVisible.value = false;
+    snackBarMessage.value = 'Cadastro completo com sucesso!';
+  };
 
-const getAppointmentsUser = async () => {
-  // const id = userId.value;
-  try {
-    const response = await getAppointmentsAPI();
-    // console.log("Agendamentos: estamos na landingPage ", response.data);
-    useStore.getAppointmentsStore(response)
-  } catch (error) {
-    // console.error("Erro ao buscar agendamentos:", error.response.data.message);
-    const dataError = {
-      message: error.response.data.message,
-      status: error.response.status,
+  const closePaymentsDialog = () => {
+    showPayments.value = true;
+    selectedPaymentMethod.value = null;
+    paymentResult.value = null;
+  };
+  const errorFormStudentsCreate = status => {
+    if (status !== 409) {
+      snackBarVisible.value = true;
+      snackBarMessage.value = 'Preencha todos os campos obrigatórios!';
     }
-    // console.log(' estamos na landing ',dataError);
-    useStore.errorMessages(dataError)
+    if (status === 409) {
+      dialogVisible.value = false;
 
+      snackBarVisible.value = true;
+      snackBarMessage.value = 'O Usuario já está com o perfil Completo.!';
+      setTimeout(() => {
+        handleLogout();
+      }, 4000);
+    }
+  };
+  const handleLogout = async () => {
+    try {
+      const response = await logoutApi();
+
+      store.logout(response);
+      await router.push('/login');
+    } catch (error) {
+      console.error('Error ao fazer o Logout ', error);
+    }
+  };
+  const payments = async () => {
+    const id = userId.value;
+    // console.log('id', id);
+    // Recupera os pagamentos
+    try {
+      const response = await getPaymentsApi(id);
+      // console.log("Pagamentos:", response);
+      useStore.payments(response.data);
+    } catch (error) {
+      // console.error("Erro ao buscar pagamentos:", error.response.data.message);
+      const errorResponse = {
+        message: error.response.data.message,
+        status: error.response.status,
+      };
+      // console.log(errorResponse);
+      useStore.errorPayments(errorResponse);
+    }
+  };
+
+  const getAppointmentsUser = async () => {
+    // const id = userId.value;
+    try {
+      const response = await getAppointmentsAPI();
+      // console.log("Agendamentos: estamos na landingPage ", response.data);
+      useStore.getAppointmentsStore(response)
+    } catch (error) {
+      // console.error("Erro ao buscar agendamentos:", error.response.data.message);
+      const dataError = {
+        message: error.response.data.message,
+        status: error.response.status,
+      }
+      // console.log(' estamos na landing ',dataError);
+      useStore.errorMessages(dataError)
+
+    }
+  };
+  function formatTime (time) {
+    return time.slice(0, 5); // "07:00:00" => "07:00"
   }
-};
+
+  function capitalize (text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
 </script>
 
 <style scoped>
