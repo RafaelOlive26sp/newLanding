@@ -57,9 +57,7 @@ export const userUseStore = defineStore('user',{
     },
     async handlePayments(response){
       try {
-        // console.log(`Dados recebidos pela api ${response}`);
-
-          this.responsePaymentSuccess = response
+        this.responsePaymentSuccess = response
       } catch (error) {
         console.log(error);
 
@@ -68,14 +66,8 @@ export const userUseStore = defineStore('user',{
     async getAppointmentsStore(response){
       try {
         this.responseGetAppointments = response
-        console.log(response);
-
       } catch (error) {
-        // console.log('estamos dentro de store na funcao error ',error.response);
-
         this.errorMessageOther = error.response
-
-
       }
     },
     async errorMessages(response){
@@ -85,7 +77,7 @@ export const userUseStore = defineStore('user',{
         console.log(error);
 
       }
-    }
+    },
 
   }
 })
