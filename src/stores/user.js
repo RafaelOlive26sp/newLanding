@@ -44,6 +44,8 @@ export const userUseStore = defineStore('user',{
     async payments(response){
       try {
         this.responseGetPayment = response
+        this.errorMessagePayment =[]
+
       } catch (error) {
         console.log(error)
       }
