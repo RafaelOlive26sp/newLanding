@@ -9,7 +9,7 @@ export const userUseStore = defineStore('user',{
     responseGetPayment:{},
     errorMessagePayment:[],
     responsePaymentSuccess:[],
-    errorMessages:[],
+    errorMessageOther:[],
     responseGetAppointments:[],
 
   }),
@@ -73,11 +73,19 @@ export const userUseStore = defineStore('user',{
       } catch (error) {
         // console.log('estamos dentro de store na funcao error ',error.response);
 
-        this.errorMessages = error.response
+        this.errorMessageOther = error.response
 
 
       }
     },
+    async errorMessages(response){
+      try {
+        this.errorMessageOther = response
+      } catch (error) {
+        console.log(error);
+
+      }
+    }
 
   }
 })
