@@ -95,16 +95,34 @@
                   md="4"
                   sm="6"
                 >
-                  <v-card class="pa-4" color="grey-lighten-4" elevation="2" rounded="lg">
+                  <v-card
+                    class="pa-4 position-relative"
+                    :color="isAbsent(appointment.id, schedule.day_of_week) ? '#fdecea' : 'grey-lighten-4'"
+                    elevation="2"
+                    rounded="lg"
+                  >
+                    <v-btn
+                      icon
+                      size="x-small"
+                      variant="text"
+                      color="grey"
+                      class="position-absolute"
+                      style="top: 6px; right: 6px;"
+                      @click="toggleFalta(appointment.id, schedule.day_of_week)"
+                    >
+                      <v-icon size="18">mdi-close-circle-outline</v-icon>
+                      <v-tooltip activator="parent" location="top">Faltar</v-tooltip>
+                    </v-btn>
+
                     <v-card-title class="text-h6 teal--text text--darken-1">
                       <v-icon color="teal" left>mdi-calendar</v-icon>
                       {{ capitalize(schedule.day_of_week) }}
                     </v-card-title>
+
                     <v-card-text>
                       <p class="mb-1">
                         <v-icon color="teal" left small>mdi-clock-outline</v-icon>
-                        <strong>Horário:</strong> {{ formatTime(schedule.start_time) }} - {{
-                          formatTime(schedule.end_time) }}
+                        <strong>Horário:</strong> {{ formatTime(schedule.start_time) }} - {{ formatTime(schedule.end_time) }}
                       </p>
                       <p class="mb-1">
                         <v-icon color="teal" left small>mdi-account-group</v-icon>
@@ -119,6 +137,8 @@
                 </v-col>
               </template>
             </v-row>
+
+
 
 
           </div>
@@ -273,13 +293,14 @@
   const dialogVisible = ref(false);
   const drawer = ref(false);
   const showPayments = ref(false);
-  const showAppointments = ref(false);
+  // const showAppointments = ref(false);
   const theme = ref('light');
   const isProfileComplete = ref(false);
   const selectedPaymentMethod = ref(null);
   const paymentResult = ref(null);
   const snackBarMessage = ref('');
   const snackBarVisible = ref(false);
+  const faltas = ref([]);
   const profileNavigation = ref({
     name: store.user?.name,
     greenting: 'Seja bem vindo(a)',
@@ -444,12 +465,26 @@
 
     }
   };
-  function formatTime (time) {
-    return time.slice(0, 5); // "07:00:00" => "07:00"
+  function toggleFalta(appointmentId, dayOfWeek) {
+    const key = `${appointmentId}-${dayOfWeek}`
+    const index = faltas.value.indexOf(key)
+    if (index >= 0) {
+      faltas.value.splice(index, 1)
+    } else {
+      faltas.value.push(key)
+    }
   }
 
-  function capitalize (text) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
+  function isAbsent(appointmentId, dayOfWeek) {
+    return faltas.value.includes(`${appointmentId}-${dayOfWeek}`)
+  }
+
+  function formatTime(time) {
+    return time.slice(0, 5)
+  }
+
+  function capitalize(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
 </script>
