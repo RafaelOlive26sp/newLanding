@@ -65,14 +65,16 @@
             </h2>
             <prev>
 
-              <!-- {{ responseAppointments.data }} -->
+              <!-- {{ responseAppointmentsGet }} -->
+              {{ errorMessagesOther.status }}
             </prev>
             <!-- {{ responseAppointments.message }} -->
-            <v-alert  v-if="responseAppointments.status === 404" border="top"  type="warning" variant="outlined" prominent >
-              {{ responseAppointments.message }}
+            <v-alert v-if="errorMessagesOther.status"  border="top"  type="warning" variant="outlined" prominent >
+              {{ errorMessagesOther?.message }}
             </v-alert>
             <v-row v-else>
-              <v-col v-for="(appointment, i) in responseAppointments[0].classe.schedules_patterns" :key="i" cols="12" md="4" sm="6">
+              {{ responseAppointmentsGet }}
+              <v-col v-for="(appointment, i) in responseAppointmentsGet[0]?.data.classe.schedules_patterns" :key="i" cols="12" md="4" sm="6">
                 <v-card class="pa-4" color="grey-lighten-4" elevation="2" rounded="lg">
                   <pre>
 
@@ -249,8 +251,8 @@ const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord);
 const userId = computed(() => store.user?.id);
 const notPayments = computed(() => useStore.errorMessagePayment);
 const dataPayments = computed(() => { return useStore.responseGetPayment });
-const errorMessages = computed(() => useStore.errorMessages);
-const responseAppointments = computed(() => useStore.responseGetAppointments.data);
+const errorMessagesOther = computed(() => useStore.errorMessageOther);
+const responseAppointmentsGet = computed(() => useStore.responseGetAppointments);
 
 const appointments = ref([
   {
@@ -386,7 +388,7 @@ const getAppointmentsUser = async () => {
       status: error.response.status,
     }
     // console.log(' estamos na landing ',dataError);
-    useStore.getAppointmentsStore(dataError)
+    useStore.errorMessages(dataError)
 
   }
 };
