@@ -6,9 +6,9 @@
           <v-card-title class="justify-center text-h5 font-weight-bold text-primary">Bem-vindo de Volta!</v-card-title>
           <v-card-text>
             <v-form @submit.prevent="submitLogin" ref="loginForm">
-              <v-text-field v-model="email" label="E-mail" type="email" required prepend-inner-icon="mdi-email"
+              <v-text-field v-model="email" label="E-mail" type="email" :rules="[rules.email, rules.required]" required prepend-inner-icon="mdi-email"
                 variant="outlined" color="primary"></v-text-field>
-              <v-text-field v-model="password" label="Senha" type="password" required prepend-inner-icon="mdi-lock"
+              <v-text-field v-model="password" label="Senha" type="password" :rules="[rules.required, rules.password]" required prepend-inner-icon="mdi-lock"
                 variant="outlined" color="primary"></v-text-field>
               <v-btn type="submit" color="primary" class="mt-4" block rounded>Entrar</v-btn>
             </v-form>
@@ -63,6 +63,17 @@
   const dialogView = ref(false)
   const snackbarMessage = ref("");
   const snackbar = ref(false);
+  const rules = {
+    required: (value) => !!value || 'Campo obrigatório',
+    email: (value) => {
+      const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return pattern.test(value) || 'E-mail inválido';
+    },
+    password: (value) => {
+      const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+      return pattern.test(value) || `Senha deve ter pelo menos 8 caracteres.`;
+    },
+  }
 
   watch(
     ()=>useStore.responseCadastro,

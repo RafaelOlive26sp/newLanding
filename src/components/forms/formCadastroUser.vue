@@ -36,7 +36,7 @@
   const rules = {
     required: v => !!v || 'Campo obrigatório.',
     email: v => /.+@.+\..+/.test(v) || 'E-mail inválido.',
-    min: v => v.length >= 6 || 'Mínimo de 6 caracteres.',
+    min: v => v.length >= 6 || 'Mínimo de 8 caracteres.',
   }
   const loading = ref(false)
 

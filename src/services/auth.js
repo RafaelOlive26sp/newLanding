@@ -3,11 +3,7 @@ import Cookies from 'js-cookie';
 
 
 export const login = async (credentials) => {
-
-
   const response = await api.post('/api/login', credentials)
-  // console.log('response da api login',response.data);
-
   return response.data
 }
 
