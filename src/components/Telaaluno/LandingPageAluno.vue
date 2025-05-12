@@ -17,9 +17,6 @@
         <v-list-item @click="(showPayments = true), payments()">
           <v-list-item-title>Pagamentos</v-list-item-title>
         </v-list-item>
-        <!-- <v-list-item @click="(showAppointments = !showAppointments), getAppointmentsUser()">
-          <v-list-item-title>Meus Agendamentos</v-list-item-title>
-        </v-list-item> -->
       </v-list>
     </v-navigation-drawer>
 
