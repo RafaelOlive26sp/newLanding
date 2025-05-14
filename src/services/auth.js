@@ -11,7 +11,7 @@ export const logout = async () => {
   const token = Cookies.get('access_token')
   const response = await api.post('/api/v1/logout', null, {
     headers: {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
     }
   })
   return response.data
