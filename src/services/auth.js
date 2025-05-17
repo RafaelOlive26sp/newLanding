@@ -5,7 +5,12 @@ import Cookies from 'js-cookie';
 export const login = async (credentials) => {
 
 
-  const response = await api.post('/api/login', credentials)
+  const response = await api.post('/api/login', credentials,{
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  })
   // console.log('response da api login',response.data);
 
   return response.data
