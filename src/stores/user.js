@@ -1,85 +1,47 @@
 import { defineStore } from "pinia";
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from "@/stores/auth";
 // import { getAppointments, handlePayment } from "@/services/user";
 
-export const userUseStore = defineStore('user',{
-  state:()=>({
-    completeProfile:[],
-    responseCadastro:[],
-    responseGetPayment:{},
-    errorMessagePayment:[],
-    responsePaymentSuccess:[],
-    errorMessageOther:[],
-    responseGetAppointments:[],
-
+export const userUseStore = defineStore("user", {
+  state: () => ({
+    completeProfile: [],
+    responseCadastro: [],
+    responseGetPayment: {},
+    errorMessagePayment: [],
+    responsePaymentSuccess: [],
+    errorMessageOther: [],
+    responseGetAppointments: [],
   }),
-  getters:{
-
+  getters: {},
+  actions: {
+    async completeProfileUser(response) {
+      this.completeProfile = response;
+      if (response.status === 201) {
+        const userLocalStorage = JSON.parse(localStorage.getItem("user"));
+        userLocalStorage.CompleteStudentRecord = true;
+        localStorage.setItem("user", JSON.stringify(userLocalStorage)); // atualiza os dados do localStorage
+        const useAuth = useAuthStore(); // acessa o authStore
+        useAuth.user = userLocalStorage; // quando acessa o authStore, vai ate a variavel user para atualizar conforme o localStore
+      }
+    },
+    async cadastroUser(response) {
+      this.responseCadastro = response;
+    },
+    async payments(response) {
+      this.responseGetPayment = response;
+      this.errorMessagePayment = [];
+    },
+    async errorPayments(response) {
+      this.errorMessagePayment = response;
+    },
+    async handlePayments(response) {
+      this.responsePaymentSuccess = response;
+    },
+    async getAppointmentsStore(response) {
+      this.responseGetAppointments = response;
+    },
+    async errorMessages(response) {
+      this.errorMessageOther = response;
+    },
   },
-  actions:{
-    async completeProfileUser(response){
-      try {
-        this.completeProfile = response
-        if(response.status === 201){
-          const userLocalStorage = JSON.parse(localStorage.getItem('user'));
-          userLocalStorage.CompleteStudentRecord = true
-          localStorage.setItem('user', JSON.stringify(userLocalStorage)) // atualiza os dados do localStorage
-          const useAuth = useAuthStore() // acessa o authStore
-          useAuth.user = userLocalStorage // quando acessa o authStore, vai ate a variavel user para atualizar conforme o localStore
-        }
-
-      } catch (error) {
-        console.log(error);
-
-      }
-    },
-    async cadastroUser(response){
-      try {
-        this.responseCadastro = response
-      } catch (error) {
-        console.log(error);
-
-      }
-    },
-    async payments(response){
-      try {
-        this.responseGetPayment = response
-        this.errorMessagePayment =[]
-
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    async errorPayments(response){
-      try {
-        this.errorMessagePayment = response
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    async handlePayments(response){
-      try {
-        this.responsePaymentSuccess = response
-      } catch (error) {
-        console.log(error);
-
-      }
-    },
-    async getAppointmentsStore(response){
-      try {
-        this.responseGetAppointments = response
-      } catch (error) {
-        this.errorMessageOther = error.response
-      }
-    },
-    async errorMessages(response){
-      try {
-        this.errorMessageOther = response
-      } catch (error) {
-        console.log(error);
-
-      }
-    },
-
-  }
-})
+});
