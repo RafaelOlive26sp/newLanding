@@ -7,7 +7,7 @@
       :rules="[rules.required, rules.email]" required />
 
     <v-text-field v-model="dataInputs.password" label="Senha" type="password" prepend-inner-icon="mdi-lock"
-      :rules="[rules.required, rules.min]" required />
+      :rules="[rules.required, rules.password]" required />
 
     <v-btn :loading="loading" @click="loading = !loading" type="submit" class="mt-4" block color="primary" :disabled="!formValid">
       Cadastrar
@@ -34,9 +34,20 @@
   })
   const formValid = ref(false);
   const rules = {
-    required: v => !!v || 'Campo obrigatório.',
-    email: v => /.+@.+\..+/.test(v) || 'E-mail inválido.',
-    min: v => v.length >= 6 || 'Mínimo de 8 caracteres.',
+    required: (value) => !!value || 'Campo obrigatório',
+    email: (value) => {
+      const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return pattern.test(value) || 'E-mail inválido';
+    },
+    password: (value) => {
+      if (value.length < 6) return 'A senha deve ter pelo menos 6 caracteres';
+      if (!/(?=.*[a-z])/.test(value)) return 'A senha deve conter pelo menos uma letra minúscula';
+      if (!/(?=.*[A-Z])/.test(value)) return 'A senha deve conter pelo menos uma letra maiúscula';
+      if (!/(?=.*\d)/.test(value)) return 'A senha deve conter pelo menos um número';
+      if (!/^[a-zA-Z\d]+$/.test(value)) return 'A senha só pode conter letras e números';
+      return true;
+    },
+
   }
   const loading = ref(false)
 

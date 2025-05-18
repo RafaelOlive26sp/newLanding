@@ -70,9 +70,14 @@
       return pattern.test(value) || 'E-mail inválido';
     },
     password: (value) => {
-      const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-      return pattern.test(value) || `Senha deve ter pelo menos 8 caracteres.`;
+      if (value.length < 6) return 'A senha deve ter pelo menos 6 caracteres';
+      if (!/(?=.*[a-z])/.test(value)) return 'A senha deve conter pelo menos uma letra minúscula';
+      if (!/(?=.*[A-Z])/.test(value)) return 'A senha deve conter pelo menos uma letra maiúscula';
+      if (!/(?=.*\d)/.test(value)) return 'A senha deve conter pelo menos um número';
+      if (!/^[a-zA-Z\d]+$/.test(value)) return 'A senha só pode conter letras e números';
+      return true;
     },
+
   }
 
   watch(
