@@ -16,7 +16,7 @@
     </a>
     <div class="text-caption text-disabled" style="position: absolute; right: 16px;">
       <v-btn variant="tonal" size="small" @click="handleLogout" color="warning" append-icon="mdi-logout">
-        Logout
+        Sair
       </v-btn>
     </div>
   </v-footer>
@@ -38,7 +38,7 @@
     {
       title: 'Documentation GitHub',
       icon: `mdi-github`,
-      href: 'https://github.com/RafaelOlive26sp/dashTeacher_fit.git',
+      href: 'https://github.com/RafaelOlive26sp/',
     },
 
   ]
