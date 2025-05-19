@@ -23,7 +23,12 @@
     <!-- App Bar -->
     <v-app-bar app color="teal-darken-1" dark>
       <v-app-bar-nav-icon @click="drawer = !drawer" />
-      <v-toolbar-title>Área do Aluno</v-toolbar-title>
+      <v-toolbar-title
+        class="text-h6 toolbar-title-responsive"
+        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;"
+      >
+        Área do Aluno
+      </v-toolbar-title>
       <v-spacer />
       <v-btn icon @click="toggleTheme">
         <v-icon>{{
@@ -345,6 +350,7 @@
     snackBarVisible.value = true;
     dialogVisible.value = false;
     snackBarMessage.value = 'Cadastro completo com sucesso!';
+    getAppointmentsUser()
   };
 
   const closePaymentsDialog = () => {
@@ -439,4 +445,32 @@
 .v-alert {
   cursor: pointer;
 }
+
+
+
+.toolbar-title-responsive {
+  font-size: 1.25rem;
+  transition: font-size 0.2s;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  text-align: left;
+}
+
+@media (max-width: 600px) {
+  .toolbar-title-responsive {
+    font-size: 1rem;
+    text-align: left;
+  }
+}
+
+@media (max-width: 500px) {
+  .toolbar-title-responsive {
+    font-size: 0.85rem;
+    text-align: left;
+  }
+}
+
 </style>
