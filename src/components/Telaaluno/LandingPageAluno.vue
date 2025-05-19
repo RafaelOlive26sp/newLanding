@@ -345,6 +345,7 @@
     snackBarVisible.value = true;
     dialogVisible.value = false;
     snackBarMessage.value = 'Cadastro completo com sucesso!';
+    getAppointmentsUser()
   };
 
   const closePaymentsDialog = () => {
