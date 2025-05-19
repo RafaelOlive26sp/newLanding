@@ -74,7 +74,16 @@
               Meus Agendamentos
             </h2>
             <v-alert
-              v-if="errorMessagesOther.status"
+              v-if="notPayments.status"
+              border="top"
+              prominent
+              type="warning"
+              variant="outlined"
+            >
+              {{ notPayments?.message }}
+            </v-alert>
+            <v-alert
+              v-else-if="errorMessagesOther.status"
               border="top"
               prominent
               type="warning"
@@ -259,6 +268,7 @@
     handlePayment as handlePaymentAPI,
   } from '@/services/user';
   import { userUseStore } from '@/stores/user.js';
+import { isEmpty } from 'vuetify/lib/util/helpers.mjs';
 
   const useStore = userUseStore();
   const router = useRouter();
@@ -297,6 +307,7 @@
 
   onMounted(() => {
     getAppointmentsUser();
+    errorIsPaymentOrAppointment();
   });
 
 
@@ -351,6 +362,7 @@
     dialogVisible.value = false;
     snackBarMessage.value = 'Cadastro completo com sucesso!';
     getAppointmentsUser()
+    payments()
   };
 
   const closePaymentsDialog = () => {
@@ -431,6 +443,17 @@
   function capitalize(text) {
     return text.charAt(0).toUpperCase() + text.slice(1)
   }
+  const errorIsPaymentOrAppointment = () => {
+    payments()
+    if (!notPayments.status === 404) {
+      return true
+      console.log('Tem pagamentos');
+      
+    }
+    console.log('nao tem pagamentos');
+    
+    return false
+  }
 
 </script>
 
@@ -447,7 +470,7 @@
 }
 
 
-
+/* 
 .toolbar-title-responsive {
   font-size: 1.25rem;
   transition: font-size 0.2s;
@@ -464,13 +487,13 @@
     font-size: 1rem;
     text-align: left;
   }
-}
+} */
 
-@media (max-width: 500px) {
+/* @media (max-width: 300px) {
   .toolbar-title-responsive {
-    font-size: 0.85rem;
+    font-size: 0.35rem;
     text-align: left;
   }
-}
+} */
 
 </style>
