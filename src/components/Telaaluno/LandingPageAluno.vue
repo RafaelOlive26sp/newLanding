@@ -156,12 +156,12 @@
           <v-card-text>
             <!-- Lista de Pagamentos Pendentes -->
             <v-list v-if="notPayments.status !== 404" class="mb-4">
-              <v-list-item v-for="(payment, i) in dataPayments" :key="i">
+              <v-list-item v-for="(payment, i) in processesPaymentData" :key="i">
                 <v-list-item-content>
                   <v-list-item-title>Pagamento #{{ i + 1 }} - R$ {{ payment.amount }}</v-list-item-title>
-                  <v-list-item-subtitle>Vencimento: {{ payment.due_date }}</v-list-item-subtitle>
+                  <v-list-item-subtitle>Vencimento: {{ payment.dateFormat }}</v-list-item-subtitle>
                   <v-list-item-subtitle>
-                    Status: <span class="text-yellow-darken-3 text-overline font-weight-black">{{ payment.status }}</span>
+                    Status: <span class="text-yellow-darken-3 text-overline font-weight-black">{{ payment.statusTraduzido }}</span>
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
@@ -268,7 +268,8 @@
     handlePayment as handlePaymentAPI,
   } from '@/services/user';
   import { userUseStore } from '@/stores/user.js';
-import { isEmpty } from 'vuetify/lib/util/helpers.mjs';
+  import {format, parseISO, addDays } from 'date-fns';
+  import {ptBR} from "date-fns/locale";
 
   const useStore = userUseStore();
   const router = useRouter();
@@ -301,7 +302,6 @@ import { isEmpty } from 'vuetify/lib/util/helpers.mjs';
   const ifCompleteProfile = computed(() => store.user?.CompleteStudentRecord);
   const userId = computed(() => store.user?.id);
   const notPayments = computed(() => useStore.errorMessagePayment);
-  const dataPayments = computed(() => { return useStore.responseGetPayment });
   const errorMessagesOther = computed(() => useStore.errorMessageOther);
   const responseAppointmentsGet = computed(() => useStore.responseGetAppointments);
 
@@ -448,12 +448,37 @@ import { isEmpty } from 'vuetify/lib/util/helpers.mjs';
     if (!notPayments.status === 404) {
       return true
       console.log('Tem pagamentos');
-      
+
     }
     console.log('nao tem pagamentos');
-    
+
     return false
   }
+  const STATUS_TRANSLATIONS ={
+    pending: 'Pendente',
+    paid: 'Pago',
+    overdue: 'Vencido',
+  };
+
+  const getStatusPayment = (status) => {
+    return STATUS_TRANSLATIONS[status] || status; // retorna o status traduzido ou o status original se não houver tradução
+  }
+  const getDatePayment = (date) => { // retorna a data formatada
+    if (!date) return null;
+    const parsedDate = parseISO(date);
+    const adjustedDate = addDays(parsedDate, 0);
+    return format(adjustedDate, 'dd/MM/yyyy', { locale: ptBR });
+
+  }
+  const processesPaymentData = computed(() => { // retorna os dados do pagamento, com os novos campos ajustados
+    const dataPayments = useStore.responseGetPayment;
+   return dataPayments.map(datapayments => ({
+     ...datapayments,
+      statusTraduzido: getStatusPayment(datapayments.status),
+      dateFormat: getDatePayment(datapayments.due_date),
+   }))
+  })
+
 
 </script>
 
@@ -470,7 +495,7 @@ import { isEmpty } from 'vuetify/lib/util/helpers.mjs';
 }
 
 
-/* 
+/*
 .toolbar-title-responsive {
   font-size: 1.25rem;
   transition: font-size 0.2s;
