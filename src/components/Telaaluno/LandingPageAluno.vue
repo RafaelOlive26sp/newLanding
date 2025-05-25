@@ -73,6 +73,7 @@
             <h2 class="text-h5 teal--text text--darken-1 mb-4">
               Meus Agendamentos
             </h2>
+            {{ processesAppointmentsData }}
             <v-alert
               v-if="notPayments.status"
               border="top"
@@ -107,16 +108,16 @@
                     rounded="lg"
                   >
                     <v-btn
+                      class="position-absolute"
+                      color="grey"
                       icon
                       size="x-small"
-                      variant="text"
-                      color="grey"
-                      class="position-absolute"
                       style="top: 6px; right: 6px;"
+                      variant="text"
                       @click="toggleFalta(appointment.id, schedule.day_of_week)"
                     >
                       <v-icon size="18">mdi-close-circle-outline</v-icon>
-                      <v-tooltip activator="parent" location="top">Faltar</v-tooltip>
+                      <v-tooltip activator="parent" location="top">Desmarcar</v-tooltip>
                     </v-btn>
 
                     <v-card-title class="text-h6 teal--text text--darken-1">
@@ -147,7 +148,7 @@
       </v-container>
 
       <!-- Payments Dialog -->
-      <v-dialog v-model="showPayments" width="500" >
+      <v-dialog v-model="showPayments" width="500">
 
         <v-card color="grey-lighten-4">
           <v-card-title class="text-h6 teal--text text--darken-1">
@@ -195,7 +196,7 @@
               :rules="[rules.required, rules.min]"
               type="number"
             />
-              <!-- Boatao para  Pagamento -->
+            <!-- Boatao para  Pagamento -->
             <v-card-actions v-if="paymentAmount">
               <v-spacer />
               <v-btn
@@ -204,7 +205,7 @@
                 :disabled="!selectedPaymentMethod || !paymentAmount"
                 @click="generatePayment"
               >
-                {{ selectedPaymentMethod === "PIX" ? "Gerar QR Code PIX" : "Gerar Boleto" }}
+                Efetuar Pagamento ficticio
               </v-btn>
               <v-btn text @click="closePaymentsDialog">Fechar</v-btn>
             </v-card-actions>
@@ -212,10 +213,10 @@
             <!-- Loader de Processamento -->
             <v-progress-circular
               v-if="isProcessing"
+              class="d-flex justify-center my-6"
               color="teal"
               indeterminate
               size="64"
-              class="d-flex justify-center my-6"
             />
 
             <!-- Tela de Sucesso -->
@@ -268,8 +269,8 @@
     handlePayment as handlePaymentAPI,
   } from '@/services/user';
   import { userUseStore } from '@/stores/user.js';
-  import {format, parseISO, addDays } from 'date-fns';
-  import {ptBR} from "date-fns/locale";
+  import { addDays, format, parseISO } from 'date-fns';
+  import { ptBR } from 'date-fns/locale';
 
   const useStore = userUseStore();
   const router = useRouter();
@@ -311,7 +312,7 @@
   });
 
 
-  const paymentMethods = ref(['PIX', 'Boleto Bancário']);
+  const paymentMethods = ref(['PIX']);
   const toggleTheme = () => {
     theme.value = theme.value === 'light' ? 'dark' : 'light';
   };
@@ -422,7 +423,7 @@
 
     }
   };
-  function toggleFalta(appointmentId, dayOfWeek) {
+  function toggleFalta (appointmentId, dayOfWeek) {
     const key = `${appointmentId}-${dayOfWeek}`
     const index = faltas.value.indexOf(key)
     if (index >= 0) {
@@ -432,20 +433,20 @@
     }
   }
 
-  function isAbsent(appointmentId, dayOfWeek) {
+  function isAbsent (appointmentId, dayOfWeek) {
     return faltas.value.includes(`${appointmentId}-${dayOfWeek}`)
   }
 
-  function formatTime(time) {
+  function formatTime (time) {
     return time.slice(0, 5)
   }
 
-  function capitalize(text) {
+  function capitalize (text) {
     return text.charAt(0).toUpperCase() + text.slice(1)
   }
   const errorIsPaymentOrAppointment = () => {
     payments()
-    if (!notPayments.status === 404) {
+    if (!notPayments.value.status === 404) {
       return true
       console.log('Tem pagamentos');
 
@@ -459,24 +460,50 @@
     paid: 'Pago',
     overdue: 'Vencido',
   };
+  const DIAS_TRANSLATIONS = {
+    monday: 'Segunda-feira',
+    tuesday: 'Terça-feira',
+    wednesday: 'Quarta-feira',
+    thursday: 'Quinta-feira',
+    friday: 'Sexta-feira',
+    saturday: 'Sábado',
+    sunday: 'Domingo',
+  }
+  const LEVEL_TRANSLATIONS = {
+    beginner: 'Iniciante',
+    intermediate: 'Intermediário',
+    advanced: 'Avançado',
+  }
 
-  const getStatusPayment = (status) => {
+  const getStatusPayment = status => {
     return STATUS_TRANSLATIONS[status] || status; // retorna o status traduzido ou o status original se não houver tradução
   }
-  const getDatePayment = (date) => { // retorna a data formatada
+  const getLevel = level => {
+    return LEVEL_TRANSLATIONS[level] || level; // retorna o status traduzido ou o status original se não houver tradução
+  }
+  const getDay = day => {
+    return DIAS_TRANSLATIONS[day] || day; // retorna o status traduzido ou o status original se não houver tradução
+  }
+  const getDatePayment = date => { // retorna a data formatada
     if (!date) return null;
     const parsedDate = parseISO(date);
     const adjustedDate = addDays(parsedDate, 0);
     return format(adjustedDate, 'dd/MM/yyyy', { locale: ptBR });
 
   }
+  const getDays = days => { // retorna a data formatada
+    if (!days) return null;
+    return days.map(day => getDay(day)).join(', ');
+
+
+  }
   const processesPaymentData = computed(() => { // retorna os dados do pagamento, com os novos campos ajustados
     const dataPayments = useStore.responseGetPayment;
-   return dataPayments.map(datapayments => ({
-     ...datapayments,
+    return dataPayments.map(datapayments => ({
+      ...datapayments,
       statusTraduzido: getStatusPayment(datapayments.status),
       dateFormat: getDatePayment(datapayments.due_date),
-   }))
+    }))
   })
 
 
