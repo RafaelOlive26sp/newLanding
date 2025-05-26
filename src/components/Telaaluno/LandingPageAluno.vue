@@ -73,7 +73,10 @@
             <h2 class="text-h5 teal--text text--darken-1 mb-4">
               Meus Agendamentos
             </h2>
-            {{ processesAppointmentsData }}
+            <pre>
+
+              {{ processesAppointmentsData }}
+            </pre>
             <v-alert
               v-if="notPayments.status"
               border="top"
@@ -93,7 +96,7 @@
               {{ errorMessagesOther?.message }}
             </v-alert>
             <v-row v-else>
-              <template v-for="(appointment, i) in responseAppointmentsGet.data" :key="appointment.id">
+              <template v-for="(appointment, i) in processesAppointmentsData" :key="appointment.id">
                 <v-col
                   v-for="(schedule, j) in appointment.classe.schedules_patterns"
                   :key="`card-${i}-${j}`"
@@ -101,12 +104,14 @@
                   md="4"
                   sm="6"
                 >
+                  <span>{{ appointment.day_of_weekTranslate }}</span>
                   <v-card
                     class="pa-4 position-relative"
-                    :color="isAbsent(appointment.id, schedule.day_of_week) ? '#fdecea' : 'grey-lighten-4'"
+                    :color="isAbsent(appointment.id, appointment.day_of_weekTranslate) ? '#fdecea' : 'grey-lighten-4'"
                     elevation="2"
                     rounded="lg"
                   >
+                  span>
                     <v-btn
                       class="position-absolute"
                       color="grey"
@@ -114,7 +119,7 @@
                       size="x-small"
                       style="top: 6px; right: 6px;"
                       variant="text"
-                      @click="toggleFalta(appointment.id, schedule.day_of_week)"
+                      @click="toggleFalta(appointment.id, appointment.day_of_weekTranslate)"
                     >
                       <v-icon size="18">mdi-close-circle-outline</v-icon>
                       <v-tooltip activator="parent" location="top">Desmarcar</v-tooltip>
@@ -136,7 +141,7 @@
                       </p>
                       <p>
                         <v-icon color="teal" left small>mdi-star</v-icon>
-                        <strong>Nível:</strong> {{ appointment.classe.level }}
+                        <strong>Nível:</strong> {{ appointment.level }}
                       </p>
                     </v-card-text>
                   </v-card>
@@ -309,6 +314,7 @@
   onMounted(() => {
     getAppointmentsUser();
     errorIsPaymentOrAppointment();
+    // processesAppointmentsData();
   });
 
 
@@ -489,14 +495,22 @@
     const parsedDate = parseISO(date);
     const adjustedDate = addDays(parsedDate, 0);
     return format(adjustedDate, 'dd/MM/yyyy', { locale: ptBR });
-
   }
-  const getDays = days => { // retorna a data formatada
-    if (!days) return null;
-    return days.map(day => getDay(day)).join(', ');
+  const processesAppointmentsData = computed(() => { // retorna os dados dos agendamentos, com os novos campos ajustados
+    const dataAppointments = useStore.responseGetAppointments.data;
+    // console.log('antes de entrar no map ', dataAppointments )
+    if (!Array.isArray(dataAppointments)) {
+      return [];
+    }
 
-
-  }
+    const mapDataAppointments = dataAppointments?.map(dap => ({
+      ...dap,
+      day_of_weekTranslate: dap.classe.schedules_patterns.map(day => getDay(day.day_of_week)),
+      levelTranslate: getLevel(dap.classe.level),
+    }))
+    // console.log(mapDataAppointments);
+    return mapDataAppointments
+  })
   const processesPaymentData = computed(() => { // retorna os dados do pagamento, com os novos campos ajustados
     const dataPayments = useStore.responseGetPayment;
     return dataPayments.map(datapayments => ({
