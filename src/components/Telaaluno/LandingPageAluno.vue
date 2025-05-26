@@ -73,10 +73,6 @@
             <h2 class="text-h5 teal--text text--darken-1 mb-4">
               Meus Agendamentos
             </h2>
-            <pre>
-
-              {{ processesAppointmentsData }}
-            </pre>
             <v-alert
               v-if="notPayments.status"
               border="top"
@@ -104,14 +100,13 @@
                   md="4"
                   sm="6"
                 >
-                  <span>{{ appointment.day_of_weekTranslate }}</span>
                   <v-card
                     class="pa-4 position-relative"
-                    :color="isAbsent(appointment.id, appointment.day_of_weekTranslate) ? '#fdecea' : 'grey-lighten-4'"
+                    :color="isAbsent(appointment.classe.schedules_patterns[j].id, appointment.day_of_weekTranslate) ? '#fdecea' : 'grey-lighten-4'"
                     elevation="2"
                     rounded="lg"
                   >
-                  span>
+                  
                     <v-btn
                       class="position-absolute"
                       color="grey"
@@ -119,15 +114,16 @@
                       size="x-small"
                       style="top: 6px; right: 6px;"
                       variant="text"
-                      @click="toggleFalta(appointment.id, appointment.day_of_weekTranslate)"
+                      @click="toggleFalta(appointment.classe.schedules_patterns[j].id, appointment.day_of_weekTranslate)"
                     >
                       <v-icon size="18">mdi-close-circle-outline</v-icon>
-                      <v-tooltip activator="parent" location="top">Desmarcar</v-tooltip>
+                      <v-tooltip activator="parent" location="top">Desmarcar {{ appointment.classe.schedules_patterns[j].id }}</v-tooltip>
                     </v-btn>
 
                     <v-card-title class="text-h6 teal--text text--darken-1">
                       <v-icon color="teal" left>mdi-calendar</v-icon>
-                      {{ capitalize(schedule.day_of_week) }}
+                      <!-- {{ capitalize(schedule.day_of_week) }} -->
+                        {{ appointment.day_of_weekTranslate[j] }}
                     </v-card-title>
 
                     <v-card-text>
@@ -141,7 +137,7 @@
                       </p>
                       <p>
                         <v-icon color="teal" left small>mdi-star</v-icon>
-                        <strong>Nível:</strong> {{ appointment.level }}
+                        <strong>Nível:</strong> {{ appointment.levelTranslate }}
                       </p>
                     </v-card-text>
                   </v-card>
@@ -508,7 +504,6 @@
       day_of_weekTranslate: dap.classe.schedules_patterns.map(day => getDay(day.day_of_week)),
       levelTranslate: getLevel(dap.classe.level),
     }))
-    // console.log(mapDataAppointments);
     return mapDataAppointments
   })
   const processesPaymentData = computed(() => { // retorna os dados do pagamento, com os novos campos ajustados
