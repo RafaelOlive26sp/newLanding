@@ -450,11 +450,8 @@
     payments()
     if (!notPayments.value.status === 404) {
       return true
-      console.log('Tem pagamentos');
-
     }
-    console.log('nao tem pagamentos');
-
+    
     return false
   }
   const STATUS_TRANSLATIONS ={
@@ -494,11 +491,9 @@
   }
   const processesAppointmentsData = computed(() => { // retorna os dados dos agendamentos, com os novos campos ajustados
     const dataAppointments = useStore.responseGetAppointments.data;
-    // console.log('antes de entrar no map ', dataAppointments )
     if (!Array.isArray(dataAppointments)) {
       return [];
     }
-
     const mapDataAppointments = dataAppointments?.map(dap => ({
       ...dap,
       day_of_weekTranslate: dap.classe.schedules_patterns.map(day => getDay(day.day_of_week)),
