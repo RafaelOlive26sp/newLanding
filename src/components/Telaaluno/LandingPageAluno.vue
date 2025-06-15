@@ -19,6 +19,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
+     
 
     <!-- App Bar -->
     <v-app-bar app color="teal-darken-1" dark>
@@ -73,6 +74,12 @@
             <h2 class="text-h5 teal--text text--darken-1 mb-4">
               Meus Agendamentos
             </h2>
+             <div>
+              <h1>Notificações do Aluno</h1>
+              <div v-for="(message, index) in messages" :key="index">
+                {{ message }}
+              </div>
+            </div>
             <v-alert
               v-if="notPayments.status"
               border="top"
@@ -91,6 +98,9 @@
             >
               {{ errorMessagesOther?.message }}
             </v-alert>
+
+             
+               
             <v-row v-else>
               <template v-for="(appointment, i) in processesAppointmentsData" :key="appointment.id">
                 <v-col
@@ -272,6 +282,7 @@
   import { userUseStore } from '@/stores/user.js';
   import { addDays, format, parseISO } from 'date-fns';
   import { ptBR } from 'date-fns/locale';
+  import { useEchoStore } from '@/stores/echo';
 
   const useStore = userUseStore();
   const router = useRouter();
@@ -306,12 +317,39 @@
   const notPayments = computed(() => useStore.errorMessagePayment);
   const errorMessagesOther = computed(() => useStore.errorMessageOther);
   const responseAppointmentsGet = computed(() => useStore.responseGetAppointments);
+  const messages = ref([]);
+
+  const echoStore = useEchoStore();
 
   onMounted(() => {
     getAppointmentsUser();
     errorIsPaymentOrAppointment();
     // processesAppointmentsData();
+   
+
   });
+  let channel = null;
+  watch(
+  () => echoStore.isInitialized,
+  (isReady) => {
+    if (isReady) {
+      channel = echoStore.echo.value
+        .private(`students${studentId}`)
+        .listen('.NewMessage', (data) => {
+          messages.value.push(data.message);
+        });
+    }
+  },
+  { immediate: true }
+);
+
+
+onUnmounted(() => {
+  // Quando sair da view, remove o listener
+  if (channel) {
+    echoStore.leaveChannel(`private-students${studentId}`);
+  }
+});
 
 
   const paymentMethods = ref(['PIX']);

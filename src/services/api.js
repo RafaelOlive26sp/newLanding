@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://apifit-production.up.railway.app/',
+  // baseURL: 'https://apifit-production.up.railway.app/',
+  baseURL: 'http://127.0.0.1:8000/',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
