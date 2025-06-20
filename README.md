@@ -22,15 +22,14 @@ Sistema web para gestão de alunos, agendamento de aulas e controle de pagamento
 - [Express](https://expressjs.com/) — Servidor Node.js para produção.
 - [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components) — Importação automática de componentes.
 - [unplugin-vue-router](https://github.com/posva/unplugin-vue-router) — Geração automática de rotas a partir de arquivos Vue.
-- [Laravel Echo](https://laravel.com/docs/broadcasting) — Cliente para WebSocket e comunicação em tempo real.
-- [Reverb](https://github.com/laravel/reverb) — Servidor WebSocket para broadcasts em tempo real.
+- [Pusher](https://pusher.com/) — Plataforma para broadcasts em tempo real via WebSocket.
 - [Pusher-js](https://github.com/pusher/pusher-js) — Biblioteca cliente para WebSocket.
 
 ## Sistema de Notificações em Tempo Real 🔔
 *Implementado em 14 de Junho de 2025* 🆕
 
 
-Nossa aplicação utiliza WebSocket através do Laravel Echo e Reverb para proporcionar comunicação em tempo real entre o servidor e os clientes. Este sistema garante que os usuários recebam atualizações instantâneas, sem necessidade de atualizar a página.
+A aplicação utiliza WebSocket através do Laravel Echo e **Pusher** para proporcionar comunicação em tempo real entre o servidor e os clientes. Este sistema garante que os usuários recebam atualizações instantâneas, sem necessidade de atualizar a página.
 
 ### Funcionalidades Atuais:
 - 🔄 Notificação instantânea quando um aluno é movido para outra turma
@@ -68,10 +67,32 @@ npm install
    ```
 3. Edite o arquivo `.env.development` com suas configurações locais
 
+### Configurando o Pusher
+
+Para que a comunicação em tempo real funcione, você precisa configurar as credenciais do Pusher.
+
+1.  **Obtenha suas credenciais:**
+   *   Acesse sua conta no [Pusher.com](https://pusher.com/).
+   *   Crie um novo aplicativo do tipo "Channels".
+   *   Na aba "App Keys" do seu aplicativo, você encontrará as credenciais necessárias.
+
+2.  **Configure o arquivo `.env.development`:**
+   *   Abra o arquivo `.env.development` na raiz do seu projeto.
+   *   Adicione ou altere as seguintes variáveis com as credenciais que você obteve:
+
+    ```env
+    VITE_PUSHER_APP_KEY="SUA_APP_KEY_DO_PUSHER"
+    VITE_PUSHER_APP_CLUSTER="SEU_CLUSTER_DO_PUSHER"
+    VITE_BROADCASTER=pusher
+    ```
+
+**Importante:** Os valores de `VITE_PUSHER_APP_KEY` e `VITE_PUSHER_APP_CLUSTER` **devem ser idênticos** aos valores configurados no arquivo `.env` do seu projeto da API (backend) para que a comunicação funcione. A chave `APP_SECRET` do Pusher deve permanecer apenas no backend e nunca ser exposta no código do frontend.
+
 
 ## 💻 Desenvolvimento
 
 Para rodar o projeto em modo de desenvolvimento:
+
 
 ```bash
 npm run dev
